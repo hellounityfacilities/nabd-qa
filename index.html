@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NABD — Medical Centre Management | Doha, Qatar</title>
+<style>
+:root{
+  --paper:#F6F7F5; --surface:#FFFFFF; --ink:#0F2A26; --ink-2:#4A615B; --ink-3:#7D908B;
+  --maroon:#8A1538; --maroon-dk:#6B1029; --maroon-soft:#F7E9ED;
+  --teal:#0F6E6B; --teal-soft:#E4F0EF;
+  --amber:#B26A00; --amber-soft:#FBF0DE;
+  --line:#DDE3E0; --line-2:#EDF0EE;
+  --ok:#1F7A44; --bad:#B3261E; --bad-soft:#FBE9E7;
+  --r:6px; --sp:16px;
+  --fs-sans: system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Arabic","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--fs-sans);
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+body[dir="rtl"]{font-family:"Noto Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.01em}
+h1{font-size:22px} h2{font-size:17px} h3{font-size:15px}
+a{color:var(--maroon)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:216px 1fr;min-height:100vh}
+.rail{background:var(--ink);color:#DDE8E5;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.10)}
+.brand .mark{display:flex;align-items:baseline;gap:8px}
+.brand .word{font-size:21px;font-weight:700;letter-spacing:.16em;color:#fff}
+.brand .ar{font-size:16px;color:#8FB3AC}
+.brand .sub{font-size:11px;color:#7E9A94;margin-top:5px;line-height:1.4}
+.nav{padding:10px 0;overflow-y:auto;flex:1}
+.nav .grp{font-size:10.5px;letter-spacing:.11em;color:#6E8B85;padding:14px 18px 6px;text-transform:uppercase}
+.nav button{
+  display:flex;align-items:center;gap:9px;width:100%;border:0;background:none;color:#C6D8D4;
+  padding:8px 18px;cursor:pointer;text-align:start;font-size:13.5px;border-inline-start:3px solid transparent
+}
+.nav button:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav button.on{background:rgba(255,255,255,.09);color:#fff;border-inline-start-color:var(--maroon);font-weight:600}
+.nav .tag{margin-inline-start:auto;background:var(--maroon);color:#fff;border-radius:9px;padding:1px 7px;font-size:11px;font-weight:600}
+.railfoot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.10);font-size:11.5px;color:#7E9A94}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--line);padding:11px 22px;
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:20;flex-wrap:wrap
+}
+.topbar .clock{font-size:12.5px;color:var(--ink-2)}
+.spacer{margin-inline-start:auto}
+.chip{
+  border:1px solid var(--line);border-radius:20px;padding:4px 11px;font-size:12.5px;background:#fff;cursor:pointer
+}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.who{display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--maroon);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.view{padding:22px;max-width:1240px;width:100%}
+
+/* ---------- generic ---------- */
+.pagehead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.pagehead p{margin:3px 0 0;color:var(--ink-2);font-size:13px;max-width:62ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.card>header{padding:12px 16px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:10px}
+.card>header h3{flex:1}
+.card .body{padding:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.app{grid-template-columns:1fr}.rail{position:static;height:auto}.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.btn{
+  border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:var(--r);
+  padding:8px 14px;cursor:pointer;font-size:13.5px;font-weight:500
+}
+.btn:hover{background:#17403A}
+.btn.primary{background:var(--maroon);border-color:var(--maroon)}
+.btn.primary:hover{background:var(--maroon-dk)}
+.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--line-2)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--maroon);outline-offset:2px}
+
+label{display:block;font-size:12px;color:var(--ink-2);margin-bottom:4px}
+input,select,textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r);background:#fff
+}
+input:focus,select:focus,textarea:focus{border-color:var(--ink-2);outline:none;box-shadow:0 0 0 3px rgba(15,42,38,.07)}
+.field{margin-bottom:12px}
+.hint{font-size:11.5px;color:var(--ink-3);margin-top:4px}
+.err{font-size:11.5px;color:var(--bad);margin-top:4px}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:start;font-size:11.5px;color:var(--ink-3);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tr.click{cursor:pointer}
+tr.click:hover{background:var(--line-2)}
+td.r,th.r{text-align:end}
+
+.pill{display:inline-block;border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.pill.teal{background:var(--teal-soft);color:var(--teal)}
+.pill.amber{background:var(--amber-soft);color:var(--amber)}
+.pill.maroon{background:var(--maroon-soft);color:var(--maroon)}
+.pill.grey{background:var(--line-2);color:var(--ink-2)}
+.pill.ok{background:#E4F2E9;color:var(--ok)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .lab{font-size:12px;color:var(--ink-2)}
+.kpi .val{font-size:26px;font-weight:650;margin-top:5px;letter-spacing:-.02em}
+.kpi .foot{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.kpi.teal .val{color:var(--teal)} .kpi.amber .val{color:var(--amber)} .kpi.maroon .val{color:var(--maroon)}
+
+/* ---------- journey ribbon (the spine) ---------- */
+.ribbon{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.ribbon .stg{flex:1;padding:11px 10px 11px 22px;position:relative;min-width:0;border-inline-end:1px solid var(--line-2)}
+body[dir="rtl"] .ribbon .stg{padding:11px 22px 11px 10px}
+.ribbon .stg:last-child{border-inline-end:0}
+.ribbon .stg .n{font-size:10.5px;color:var(--ink-3);letter-spacing:.06em}
+.ribbon .stg .t{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ribbon .stg::before{content:"";position:absolute;inset-inline-start:9px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--line);}
+.ribbon .stg.done{background:var(--teal-soft)}
+.ribbon .stg.done::before{background:var(--teal)}
+.ribbon .stg.done .t{color:var(--teal)}
+.ribbon .stg.now{background:var(--maroon)}
+.ribbon .stg.now::before{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.28)}
+.ribbon .stg.now .t{color:#fff} .ribbon .stg.now .n{color:rgba(255,255,255,.72)}
+
+/* ---------- split bill bars ---------- */
+.splitbar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--line-2)}
+.splitbar i{display:block;height:100%}
+.splitbar i.ins{background:var(--teal)} .splitbar i.pat{background:var(--amber)}
+.legend{display:flex;gap:16px;font-size:12px;margin-top:8px;flex-wrap:wrap}
+.legend b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:5px}
+.money{font-variant-numeric:tabular-nums;font-weight:600}
+.money.ins{color:var(--teal)} .money.pat{color:var(--amber)}
+.tot{display:flex;justify-content:space-between;padding:7px 0;font-size:14px}
+.tot.big{border-top:1px solid var(--line);margin-top:6px;padding-top:12px;font-size:17px;font-weight:650}
+
+/* ---------- modal ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(15,42,38,.45);display:grid;place-items:center;padding:20px;z-index:60}
+.modal{background:var(--surface);border-radius:8px;max-width:760px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 18px 50px rgba(15,42,38,.28)}
+.modal>header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--surface)}
+.modal>header h2{flex:1}
+.modal .body{padding:20px}
+.modal>footer{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface)}
+.x{border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:var(--ink-3);padding:0 4px}
+
+.toast{position:fixed;inset-inline-end:20px;bottom:20px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:var(--r);z-index:90;font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.bad{background:var(--bad)}
+.empty{padding:34px 18px;text-align:center;color:var(--ink-3);font-size:13.5px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.slot{border:1px solid var(--line);border-radius:var(--r);padding:8px 4px;text-align:center;background:#fff;cursor:pointer;font-size:13px}
+.slot:hover{border-color:var(--maroon);color:var(--maroon)}
+.slot.taken{background:var(--line-2);color:var(--ink-3);cursor:not-allowed;text-decoration:line-through}
+.inline{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.inline>*{flex:1;min-width:130px}
+.note{background:var(--teal-soft);border-inline-start:3px solid var(--teal);padding:10px 13px;border-radius:0 var(--r) var(--r) 0;font-size:12.5px;color:#12403E}
+.note.warn{background:var(--amber-soft);border-color:var(--amber);color:#6E4300}
+.note.stop{background:var(--bad-soft);border-color:var(--bad);color:#7C1D16}
+.mini{font-size:12px;color:var(--ink-2)}
+.rowline{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+.rowline:last-child{border-bottom:0}
+@media print{.rail,.topbar,.noprint{display:none!important}.app{grid-template-columns:1fr}.view{padding:0}}
+</style>
+</head>
+<body dir="ltr">
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark"><span class="word">NABD</span><span class="ar">نبض</span></div>
+      <div class="sub" id="brandSub">Medical Centre Management<br>Doha, Qatar</div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="railfoot" id="railFoot"></div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="clock" id="clock"></div>
+      <div class="spacer"></div>
+      <button class="chip" id="langBtn">العربية</button>
+      <select id="roleSel" style="width:auto;padding:5px 9px;font-size:12.5px"></select>
+      <div class="who"><div class="avatar" id="avatar">MI</div></div>
+    </div>
+    <main class="view" id="view"></main>
+  </div>
+</div>
+<div id="modalHost"></div>
+<div id="toastHost"></div>
+<script>
+/* ==========================================================================
+   NABD — Medical Centre Management System (Doha, Qatar)
+   Single-file prototype. No build step, no external dependencies.
+   ========================================================================== */
+
+/* ------------------------- i18n ------------------------- */
+const STR = {
+  en:{
+    dir:"ltr", other:"العربية",
+    g_front:"Front office", g_clinical:"Clinical", g_money:"Money", g_setup:"Setup",
+    nav_dash:"Dashboard", nav_patients:"Patients", nav_appts:"Appointments", nav_queue:"Queue",
+    nav_consult:"Consultation", nav_billing:"Cashier", nav_claims:"Insurance claims",
+    nav_finance:"Finance", nav_masters:"Master data",
+    role:"Role", branch:"Al Sadd branch",
+    save:"Save", cancel:"Cancel", close:"Close", search:"Search", back:"Back", print:"Print",
+    add:"Add", remove:"Remove", confirm:"Confirm", none:"Nothing here yet.",
+    st_registered:"Registered", st_booked:"Booked", st_checked_in:"Checked in",
+    st_in_consult:"Consultation", st_ready_to_bill:"Billing", st_paid:"Paid", st_claimed:"Claim sent",
+    dash_t:"Today at the centre", dash_s:"Live picture of the floor — who is waiting, what has been collected, what the insurers still owe.",
+    k_patients:"Patients today", k_waiting:"Waiting now", k_collected:"Collected today",
+    k_recv:"Insurance receivable", k_claims:"Claims awaiting settlement", k_avgwait:"Average wait",
+    pt_t:"Patients", pt_s:"Register a new patient, or open a file to book, check insurance, or review visit history.",
+    pt_new:"Register patient", pt_name:"Full name", pt_name_ar:"Name in Arabic", pt_qid:"Qatar ID (QID)",
+    pt_hc:"Health card number", pt_dob:"Date of birth", pt_sex:"Gender", pt_nat:"Nationality",
+    pt_phone:"Mobile", pt_email:"Email", pt_addr:"Zone / street / building",
+    pt_male:"Male", pt_female:"Female", pt_mrn:"File number",
+    ins_head:"Insurance", ins_self:"Self-paying (no insurance)", ins_company:"Insurer",
+    ins_plan:"Plan / class", ins_policy:"Policy number", ins_card:"Card number", ins_exp:"Card expiry",
+    ins_check:"Check eligibility", ins_eligible:"Eligible", ins_not:"Not eligible",
+    ins_copay:"Consultation co-pay", ins_coins:"Co-insurance", ins_ded:"Deductible left",
+    ins_limit:"Annual limit left", ins_appr:"Approval needed above",
+    ap_t:"Appointments", ap_s:"Pick a department, then a doctor, then a free slot. Booking a slot moves the patient to the next stage.",
+    ap_dept:"Department", ap_doctor:"Doctor", ap_date:"Date", ap_book:"Book appointment",
+    ap_today:"Today's schedule", ap_checkin:"Check in", ap_slotfree:"Free slots",
+    q_t:"Waiting room", q_s:"Checked-in patients in arrival order. Call a patient to start the consultation.",
+    q_call:"Call patient", q_waiting:"Waiting", q_inconsult:"With the doctor",
+    c_t:"Consultation", c_s:"Record the encounter, then order services. Everything ordered here lands on the bill and the claim.",
+    c_vitals:"Vitals", c_bp:"Blood pressure", c_pulse:"Pulse", c_temp:"Temp °C", c_wt:"Weight kg", c_ht:"Height cm",
+    c_complaint:"Presenting complaint", c_notes:"Clinical notes", c_dx:"Diagnosis (ICD-10)",
+    c_orders:"Services and orders", c_addsvc:"Add service", c_finish:"Send to cashier",
+    b_t:"Cashier", b_s:"The bill splits itself between the insurer and the patient using the plan rules. Collect the patient share to close the visit.",
+    b_gross:"Gross amount", b_ins:"Insurer pays", b_pat:"Patient pays", b_method:"Payment method",
+    b_cash:"Cash", b_card:"Credit / debit card", b_naps:"NAPS debit", b_transfer:"Bank transfer",
+    b_tendered:"Amount received", b_change:"Change", b_collect:"Collect payment", b_receipt:"Receipt",
+    b_ready:"Ready to bill", b_reason:"Why", b_svc:"Service",
+    cl_t:"Insurance claims", cl_s:"Claims built from billed visits. Submit to the insurer, then record what was settled or rejected.",
+    cl_submit:"Submit claim", cl_settle:"Record settlement", cl_status:"Status",
+    cl_draft:"Draft", cl_submitted:"Submitted", cl_paid:"Settled", cl_part:"Part settled", cl_rejected:"Rejected",
+    cl_amount:"Claimed", cl_settled:"Settled", cl_age:"Age",
+    f_t:"Finance", f_s:"Collections, revenue and what the insurers owe — posted as double-entry so it reconciles to the ledger.",
+    f_collect:"Collections by method", f_revdept:"Revenue by department", f_revdoc:"Revenue by doctor",
+    f_aging:"Insurance receivable aging", f_journal:"Journal", f_dr:"Debit", f_cr:"Credit",
+    f_account:"Account", f_ref:"Reference", f_period:"Period",
+    m_t:"Master data", m_s:"Price list, doctors and insurer plan rules. Change a rule here and every future bill follows it.",
+    m_services:"Services and prices", m_doctors:"Doctors", m_insurers:"Insurers and plans",
+    m_code:"Code", m_price:"Price", m_type:"Type", m_dhp:"DHP licence", m_fee:"Consultation fee",
+    qar:"QAR", pt_of:"Patient", dr_of:"Doctor", date:"Date", time:"Time", status:"Status", action:"Action",
+    total:"Total", amount:"Amount", visit:"Visit", excluded:"Not covered by plan",
+    needappr:"Needs pre-approval", approved:"Approved", approve:"Approve", noins:"Self-paying",
+    overlimit:"Over annual limit", dedapp:"Applied to deductible", copay:"Co-pay", coins:"Co-insurance"
+  },
+  ar:{
+    dir:"rtl", other:"English",
+    g_front:"الاستقبال", g_clinical:"العيادة", g_money:"المالية", g_setup:"الإعدادات",
+    nav_dash:"لوحة المتابعة", nav_patients:"المرضى", nav_appts:"المواعيد", nav_queue:"قائمة الانتظار",
+    nav_consult:"الكشف", nav_billing:"الصندوق", nav_claims:"مطالبات التأمين",
+    nav_finance:"المالية", nav_masters:"البيانات الأساسية",
+    role:"الصلاحية", branch:"فرع السد",
+    save:"حفظ", cancel:"إلغاء", close:"إغلاق", search:"بحث", back:"رجوع", print:"طباعة",
+    add:"إضافة", remove:"حذف", confirm:"تأكيد", none:"لا توجد بيانات بعد.",
+    st_registered:"مسجّل", st_booked:"محجوز", st_checked_in:"تم الحضور",
+    st_in_consult:"في الكشف", st_ready_to_bill:"الفوترة", st_paid:"مدفوع", st_claimed:"أُرسلت المطالبة",
+    dash_t:"اليوم في المركز", dash_s:"صورة مباشرة للعمل — من ينتظر، وما تم تحصيله، وما زال على شركات التأمين.",
+    k_patients:"مرضى اليوم", k_waiting:"في الانتظار", k_collected:"تحصيل اليوم",
+    k_recv:"مستحق من التأمين", k_claims:"مطالبات قيد السداد", k_avgwait:"متوسط الانتظار",
+    pt_t:"المرضى", pt_s:"سجّل مريضاً جديداً أو افتح الملف للحجز والتحقق من التأمين ومراجعة الزيارات.",
+    pt_new:"تسجيل مريض", pt_name:"الاسم الكامل", pt_name_ar:"الاسم بالعربية", pt_qid:"الرقم الشخصي",
+    pt_hc:"رقم البطاقة الصحية", pt_dob:"تاريخ الميلاد", pt_sex:"الجنس", pt_nat:"الجنسية",
+    pt_phone:"الجوال", pt_email:"البريد الإلكتروني", pt_addr:"المنطقة / الشارع / المبنى",
+    pt_male:"ذكر", pt_female:"أنثى", pt_mrn:"رقم الملف",
+    ins_head:"التأمين", ins_self:"دفع ذاتي (بدون تأمين)", ins_company:"شركة التأمين",
+    ins_plan:"الفئة", ins_policy:"رقم الوثيقة", ins_card:"رقم البطاقة", ins_exp:"انتهاء البطاقة",
+    ins_check:"التحقق من الأهلية", ins_eligible:"مؤهل", ins_not:"غير مؤهل",
+    ins_copay:"المشاركة في الكشف", ins_coins:"نسبة التحمل", ins_ded:"المتبقي من التحمل السنوي",
+    ins_limit:"المتبقي من الحد السنوي", ins_appr:"موافقة مسبقة فوق",
+    ap_t:"المواعيد", ap_s:"اختر القسم ثم الطبيب ثم الوقت المتاح. الحجز ينقل المريض إلى المرحلة التالية.",
+    ap_dept:"القسم", ap_doctor:"الطبيب", ap_date:"التاريخ", ap_book:"حجز موعد",
+    ap_today:"جدول اليوم", ap_checkin:"تسجيل الحضور", ap_slotfree:"الأوقات المتاحة",
+    q_t:"غرفة الانتظار", q_s:"المرضى الحاضرون بترتيب الوصول. نادِ المريض لبدء الكشف.",
+    q_call:"نداء المريض", q_waiting:"في الانتظار", q_inconsult:"مع الطبيب",
+    c_t:"الكشف", c_s:"سجّل الزيارة ثم اطلب الخدمات. كل ما يُطلب هنا يظهر في الفاتورة والمطالبة.",
+    c_vitals:"العلامات الحيوية", c_bp:"ضغط الدم", c_pulse:"النبض", c_temp:"الحرارة °م", c_wt:"الوزن كجم", c_ht:"الطول سم",
+    c_complaint:"الشكوى", c_notes:"ملاحظات طبية", c_dx:"التشخيص (ICD-10)",
+    c_orders:"الخدمات والطلبات", c_addsvc:"إضافة خدمة", c_finish:"إرسال إلى الصندوق",
+    b_t:"الصندوق", b_s:"تُقسَّم الفاتورة تلقائياً بين شركة التأمين والمريض حسب قواعد الوثيقة. حصّل نصيب المريض لإقفال الزيارة.",
+    b_gross:"الإجمالي", b_ins:"على التأمين", b_pat:"على المريض", b_method:"طريقة الدفع",
+    b_cash:"نقداً", b_card:"بطاقة ائتمان / خصم", b_naps:"بطاقة نقاط البيع", b_transfer:"تحويل بنكي",
+    b_tendered:"المبلغ المستلم", b_change:"الباقي", b_collect:"تحصيل", b_receipt:"إيصال",
+    b_ready:"جاهزة للفوترة", b_reason:"السبب", b_svc:"الخدمة",
+    cl_t:"مطالبات التأمين", cl_s:"مطالبات مبنية على الزيارات المفوترة. أرسلها للشركة ثم سجّل المسدد أو المرفوض.",
+    cl_submit:"إرسال المطالبة", cl_settle:"تسجيل السداد", cl_status:"الحالة",
+    cl_draft:"مسودة", cl_submitted:"مُرسلة", cl_paid:"مسددة", cl_part:"سداد جزئي", cl_rejected:"مرفوضة",
+    cl_amount:"المطالب به", cl_settled:"المسدد", cl_age:"العمر",
+    f_t:"المالية", f_s:"التحصيل والإيرادات والمستحق من شركات التأمين — بقيود مزدوجة تطابق دفتر الأستاذ.",
+    f_collect:"التحصيل حسب طريقة الدفع", f_revdept:"الإيراد حسب القسم", f_revdoc:"الإيراد حسب الطبيب",
+    f_aging:"أعمار المستحقات من التأمين", f_journal:"دفتر اليومية", f_dr:"مدين", f_cr:"دائن",
+    f_account:"الحساب", f_ref:"المرجع", f_period:"الفترة",
+    m_t:"البيانات الأساسية", m_s:"قائمة الأسعار والأطباء وقواعد وثائق التأمين. أي تعديل هنا يسري على الفواتير القادمة.",
+    m_services:"الخدمات والأسعار", m_doctors:"الأطباء", m_insurers:"شركات التأمين والفئات",
+    m_code:"الرمز", m_price:"السعر", m_type:"النوع", m_dhp:"رخصة المهن الصحية", m_fee:"رسوم الكشف",
+    qar:"ر.ق", pt_of:"المريض", dr_of:"الطبيب", date:"التاريخ", time:"الوقت", status:"الحالة", action:"إجراء",
+    total:"الإجمالي", amount:"المبلغ", visit:"زيارة", excluded:"غير مشمول بالوثيقة",
+    needappr:"يحتاج موافقة مسبقة", approved:"تمت الموافقة", approve:"موافقة", noins:"دفع ذاتي",
+    overlimit:"تجاوز الحد السنوي", dedapp:"خُصم من التحمل", copay:"مشاركة", coins:"نسبة تحمل"
+  }
+};
+let LANG = "en";
+const T = k => (STR[LANG][k] ?? STR.en[k] ?? k);
+const L = o => (LANG === "ar" && o && o.ar) ? o.ar : (o && o.en) || "";
+
+/* ENGINE-START — pure business rules. Extracted verbatim by the Node test suite. */
+const ClinicEngine = (function () {
+  "use strict";
+
+  const round2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+
+  /* Qatar ID: 11 digits. [0]=century (2=1900s, 3=2000s), [1..2]=year,
+     [3..5]=country of origin code, [6..10]=serial.                        */
+  function validateQID(qid) {
+    const v = String(qid || "").trim();
+    if (!/^\d{11}$/.test(v)) return { ok: false, reason: "QID must be exactly 11 digits" };
+    const century = v[0];
+    if (century !== "2" && century !== "3") return { ok: false, reason: "QID must start with 2 or 3" };
+    const yy = Number(v.slice(1, 3));
+    const year = (century === "2" ? 1900 : 2000) + yy;
+    const thisYear = new Date().getFullYear();
+    if (year > thisYear) return { ok: false, reason: "QID birth year is in the future" };
+    return { ok: true, birthYear: year, countryCode: v.slice(3, 6), serial: v.slice(6) };
+  }
+
+  /* Qatar mobile: 8 digits beginning 3, 5, 6 or 7. Accepts +974 / 00974 prefixes. */
+  function validateQatarPhone(p) {
+    const v = String(p || "").replace(/[\s-]/g, "").replace(/^(\+974|00974)/, "");
+    if (!/^[3567]\d{7}$/.test(v)) return { ok: false, reason: "Mobile must be 8 digits starting 3, 5, 6 or 7" };
+    return { ok: true, normalised: "+974 " + v.slice(0, 4) + " " + v.slice(4) };
+  }
+
+  function nextMRN(seq, year) {
+    const y = year || new Date().getFullYear();
+    return "MC-" + y + "-" + String(seq).padStart(5, "0");
+  }
+
+  function ageFrom(dob, today) {
+    const d = new Date(dob), t = today ? new Date(today) : new Date();
+    if (isNaN(d)) return null;
+    let a = t.getFullYear() - d.getFullYear();
+    const m = t.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && t.getDate() < d.getDate())) a--;
+    return a;
+  }
+
+  /* Is this card usable today? Anything false sends the visit to self-pay. */
+  function checkEligibility(ins, plan, today) {
+    const t = today ? new Date(today) : new Date();
+    const reasons = [];
+    if (!ins || !ins.insurerId) return { eligible: false, reasons: ["no_policy"] };
+    if (ins.active === false) reasons.push("policy_inactive");
+    if (!ins.expiry || new Date(ins.expiry) < t) reasons.push("card_expired");
+    if (plan && ins.limitUsed >= plan.annualLimit) reasons.push("limit_exhausted");
+    return { eligible: reasons.length === 0, reasons };
+  }
+
+  /* Splits one visit's charges between insurer and patient.
+     Order of application: exclusion -> pre-approval -> co-pay/co-insurance
+     -> deductible -> annual limit. Anything the insurer will not carry
+     falls to the patient, never silently disappears.                       */
+  function splitBill(input) {
+    const items = input.items || [];
+    const plan = input.plan || null;
+    const usage = Object.assign({ deductibleUsed: 0, limitUsed: 0 }, input.usage || {});
+    const selfPay = !plan || input.eligible === false;
+
+    let dedLeft = selfPay ? 0 : Math.max(0, round2(plan.deductible - usage.deductibleUsed));
+    let limLeft = selfPay ? 0 : Math.max(0, round2(plan.annualLimit - usage.limitUsed));
+
+    const lines = [];
+    let gross = 0, insTot = 0, patTot = 0, dedApplied = 0;
+    const pending = [];
+
+    items.forEach(function (it) {
+      const qty = it.qty == null ? 1 : Number(it.qty);
+      const amt = round2(Number(it.price) * qty);
+      let ins = 0, pat = amt, why = "self_pay";
+
+      if (!selfPay) {
+        const excluded = (plan.exclusions || []).indexOf(it.type) !== -1;
+        const needsApproval = amt >= plan.approvalThreshold;
+        if (excluded) {
+          why = "excluded";
+        } else if (needsApproval && !it.approved) {
+          why = "awaiting_approval";
+          pending.push({ code: it.code, amount: amt });
+        } else {
+          if (it.type === "consult") {
+            pat = Math.min(plan.copayConsult, amt);
+            why = "copay";
+          } else {
+            pat = round2(amt * plan.coinsurance);
+            why = "coinsurance";
+          }
+          ins = round2(amt - pat);
+
+          if (dedLeft > 0 && ins > 0) {         // deductible eats the insurer share first
+            const take = Math.min(dedLeft, ins);
+            ins = round2(ins - take); pat = round2(pat + take);
+            dedLeft = round2(dedLeft - take); dedApplied = round2(dedApplied + take);
+            why = "deductible";
+          }
+          if (ins > limLeft) {                   // annual cap
+            const over = round2(ins - limLeft);
+            ins = round2(ins - over); pat = round2(pat + over);
+            why = "over_limit";
+          }
+          limLeft = round2(limLeft - ins);
+        }
+      }
+
+      gross = round2(gross + amt); insTot = round2(insTot + ins); patTot = round2(patTot + pat);
+      lines.push({ code: it.code, name: it.name, type: it.type, qty: qty, gross: amt,
+                   insurance: ins, patient: pat, reason: why });
+    });
+
+    return {
+      lines: lines,
+      totals: { gross: gross, insurance: insTot, patient: patTot },
+      deductibleApplied: dedApplied,
+      pendingApprovals: pending,
+      usageAfter: {
+        deductibleUsed: round2(usage.deductibleUsed + dedApplied),
+        limitUsed: round2(usage.limitUsed + insTot)
+      }
+    };
+  }
+
+  /* Double-entry postings. Debits must equal credits, always. */
+  const ACC = {
+    cash: { code: "1010", en: "Cash on hand", ar: "النقدية" },
+    bank: { code: "1015", en: "Bank — card settlement", ar: "البنك — تحصيل البطاقات" },
+    arPatient: { code: "1200", en: "Patient receivable", ar: "ذمم المرضى" },
+    arInsurer: { code: "1210", en: "Insurance receivable", ar: "ذمم شركات التأمين" },
+    revenue: { code: "4000", en: "Service revenue", ar: "إيرادات الخدمات" },
+    writeOff: { code: "5900", en: "Claim rejections written off", ar: "مطالبات مرفوضة مشطوبة" }
+  };
+
+  function postingsForBill(b) {
+    const paid = round2(b.patientPaid || 0);
+    const patientDue = round2(b.patient || 0);
+    const lines = [];
+    if (paid > 0) lines.push({ acc: b.method === "cash" ? ACC.cash : ACC.bank, dr: paid, cr: 0 });
+    if (patientDue - paid > 0) lines.push({ acc: ACC.arPatient, dr: round2(patientDue - paid), cr: 0 });
+    if (b.insurance > 0) lines.push({ acc: ACC.arInsurer, dr: round2(b.insurance), cr: 0 });
+    lines.push({ acc: ACC.revenue, dr: 0, cr: round2(b.gross) });
+    return lines;
+  }
+
+  function postingsForSettlement(claimed, settled) {
+    const s = round2(settled), c = round2(claimed);
+    const lines = [{ acc: ACC.bank, dr: s, cr: 0 }];
+    if (c - s > 0) lines.push({ acc: ACC.writeOff, dr: round2(c - s), cr: 0 });
+    lines.push({ acc: ACC.arInsurer, dr: 0, cr: c });
+    return lines;
+  }
+
+  function isBalanced(lines) {
+    const dr = lines.reduce((s, l) => s + (l.dr || 0), 0);
+    const cr = lines.reduce((s, l) => s + (l.cr || 0), 0);
+    return Math.abs(round2(dr) - round2(cr)) < 0.005;
+  }
+
+  function daysBetween(from, to) {
+    const a = new Date(from), b = to ? new Date(to) : new Date();
+    return Math.max(0, Math.floor((b - a) / 86400000));
+  }
+
+  function agingBucket(days) {
+    if (days <= 30) return "0-30";
+    if (days <= 60) return "31-60";
+    if (days <= 90) return "61-90";
+    return "90+";
+  }
+
+  const STAGES = ["registered", "booked", "checked_in", "in_consult", "ready_to_bill", "paid", "claimed"];
+  function stageIndex(s) { return STAGES.indexOf(s); }
+  function canAdvance(from, to) { return stageIndex(to) === stageIndex(from) + 1; }
+
+
+  /* ---------------------------------------------------------------------
+     ICAO 9303 machine-readable zone. TD3 = passport (2x44),
+     TD1 = Qatar ID / residence permit (3x30). Check digits are verified,
+     so a misread is rejected instead of quietly creating a wrong file.
+     --------------------------------------------------------------------- */
+  function mrzCharValue(c) {
+    if (c === "<") return 0;
+    if (c >= "0" && c <= "9") return c.charCodeAt(0) - 48;
+    if (c >= "A" && c <= "Z") return c.charCodeAt(0) - 55;
+    return -1;
+  }
+  function mrzCheckDigit(s) {
+    const w = [7, 3, 1]; let sum = 0;
+    for (let i = 0; i < s.length; i++) {
+      const v = mrzCharValue(s[i]); if (v < 0) return -1;
+      sum += v * w[i % 3];
+    }
+    return sum % 10;
+  }
+  function mrzVerify(field, digit) {
+    const c = mrzCheckDigit(field);
+    return c !== -1 && String(c) === String(digit);
+  }
+  function mrzClean(s) { return String(s || "").toUpperCase().replace(/[^A-Z0-9<]/g, ""); }
+
+  function mrzDate(yymmdd, kind) {
+    if (!/^\d{6}$/.test(yymmdd)) return null;
+    const yy = Number(yymmdd.slice(0, 2)), mm = yymmdd.slice(2, 4), dd = yymmdd.slice(4, 6);
+    const curYY = new Date().getFullYear() % 100;
+    let cc;
+    if (kind === "expiry") cc = yy <= curYY + 50 ? 2000 : 1900;
+    else cc = yy > curYY ? 1900 : 2000;                    // a birth date cannot be in the future
+    if (Number(mm) < 1 || Number(mm) > 12 || Number(dd) < 1 || Number(dd) > 31) return null;
+    return (cc + yy) + "-" + mm + "-" + dd;
+  }
+
+  function mrzNames(field) {
+    const parts = String(field || "").split("<<");
+    const surname = (parts[0] || "").replace(/</g, " ").trim();
+    const given = (parts[1] || "").replace(/</g, " ").trim();
+    return { surname, given, full: (given + " " + surname).replace(/\s+/g, " ").trim() };
+  }
+
+  function parseTD3(lines) {
+    const l1 = mrzClean(lines[0]).padEnd(44, "<").slice(0, 44);
+    const l2 = mrzClean(lines[1]).padEnd(44, "<").slice(0, 44);
+    const docNo = l2.slice(0, 9), docChk = l2[9];
+    const nat = l2.slice(10, 13), dob = l2.slice(13, 19), dobChk = l2[19];
+    const sex = l2[20], exp = l2.slice(21, 27), expChk = l2[27];
+    const opt = l2.slice(28, 42), optChk = l2[42], compChk = l2[43];
+    const composite = l2.slice(0, 10) + l2.slice(13, 20) + l2.slice(21, 43);
+    const checks = {
+      documentNumber: mrzVerify(docNo, docChk),
+      dateOfBirth: mrzVerify(dob, dobChk),
+      expiry: mrzVerify(exp, expChk),
+      optional: optChk === "<" || mrzVerify(opt, optChk),
+      composite: mrzVerify(composite, compChk)
+    };
+    const names = mrzNames(l1.slice(5));
+    return {
+      format: "TD3", documentType: "passport",
+      documentNumber: docNo.replace(/</g, ""), issuer: l1.slice(2, 5).replace(/</g, ""),
+      nationality: nat.replace(/</g, ""), sex: sex === "F" ? "F" : sex === "M" ? "M" : "",
+      dateOfBirth: mrzDate(dob, "dob"), expiry: mrzDate(exp, "expiry"),
+      optionalData: opt.replace(/</g, ""),
+      surname: names.surname, givenNames: names.given, fullName: names.full,
+      checks: checks, valid: Object.keys(checks).every(k => checks[k])
+    };
+  }
+
+  function parseTD1(lines) {
+    const l1 = mrzClean(lines[0]).padEnd(30, "<").slice(0, 30);
+    const l2 = mrzClean(lines[1]).padEnd(30, "<").slice(0, 30);
+    const l3 = mrzClean(lines[2]).padEnd(30, "<").slice(0, 30);
+    const docNo = l1.slice(5, 14), docChk = l1[14], opt1 = l1.slice(15, 30);
+    const dob = l2.slice(0, 6), dobChk = l2[6], sex = l2[7];
+    const exp = l2.slice(8, 14), expChk = l2[14], nat = l2.slice(15, 18);
+    const opt2 = l2.slice(18, 29), compChk = l2[29];
+    const composite = l1.slice(5, 30) + l2.slice(0, 7) + l2.slice(8, 15) + l2.slice(18, 29);
+    const checks = {
+      documentNumber: mrzVerify(docNo, docChk),
+      dateOfBirth: mrzVerify(dob, dobChk),
+      expiry: mrzVerify(exp, expChk),
+      composite: mrzVerify(composite, compChk)
+    };
+    const names = mrzNames(l3);
+    /* Qatar prints the 11-digit QID in the optional data of the residence permit */
+    const optAll = (opt1 + opt2).replace(/</g, "");
+    const qid = (optAll.match(/\d{11}/) || [])[0] || "";
+    return {
+      format: "TD1", documentType: l1.slice(0, 2)[0] === "I" ? "id_card" : "travel_document",
+      documentNumber: docNo.replace(/</g, ""), issuer: l1.slice(2, 5).replace(/</g, ""),
+      nationality: nat.replace(/</g, ""), sex: sex === "F" ? "F" : sex === "M" ? "M" : "",
+      dateOfBirth: mrzDate(dob, "dob"), expiry: mrzDate(exp, "expiry"),
+      optionalData: optAll, qid: qid,
+      surname: names.surname, givenNames: names.given, fullName: names.full,
+      checks: checks, valid: Object.keys(checks).every(k => checks[k])
+    };
+  }
+
+  /* Accepts whatever the reader emits: 2 or 3 lines, newline or pipe separated,
+     with or without spaces. Keyboard-wedge scanners and OCR both land here.     */
+  function parseMRZ(raw) {
+    const lines = String(raw || "").split(/[\r\n|]+/).map(mrzClean).filter(x => x.length >= 28);
+    if (lines.length >= 3 && lines[0].length <= 32) return parseTD1(lines.slice(0, 3));
+    if (lines.length >= 2 && lines[0].length >= 40) return parseTD3(lines.slice(0, 2));
+    if (lines.length === 1 && lines[0].length >= 88) {
+      const s = lines[0]; return parseTD3([s.slice(0, 44), s.slice(44, 88)]);
+    }
+    if (lines.length === 1 && lines[0].length >= 90) {
+      const s = lines[0]; return parseTD1([s.slice(0, 30), s.slice(30, 60), s.slice(60, 90)]);
+    }
+    return { valid: false, error: "unreadable", checks: {} };
+  }
+
+  const NATIONALITY = { QAT:"Qatari", IND:"Indian", PAK:"Pakistani", BGD:"Bangladeshi", NPL:"Nepali",
+    LKA:"Sri Lankan", PHL:"Filipino", EGY:"Egyptian", SDN:"Sudanese", SYR:"Syrian", JOR:"Jordanian",
+    LBN:"Lebanese", PSE:"Palestinian", YEM:"Yemeni", MAR:"Moroccan", TUN:"Tunisian", DZA:"Algerian",
+    SOM:"Somali", ETH:"Ethiopian", KEN:"Kenyan", GHA:"Ghanaian", NGA:"Nigerian", IDN:"Indonesian",
+    GBR:"British", USA:"American", FRA:"French", DEU:"German", TUR:"Turkish", IRN:"Iranian",
+    IRQ:"Iraqi", SAU:"Saudi", ARE:"Emirati", KWT:"Kuwaiti", BHR:"Bahraini", OMN:"Omani" };
+  function nationalityName(code) { return NATIONALITY[code] || code || ""; }
+
+  /* ---------------------------------------------------------------------
+     Queue prediction. Tells a waiting patient when they will actually be
+     seen, and tells the front desk which doctors are running late.
+     --------------------------------------------------------------------- */
+  function minutesOf(hhmm) {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || "")); 
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+  }
+  function hhmmOf(mins) {
+    const m = Math.max(0, Math.round(mins));
+    return String(Math.floor(m / 60) % 24).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+  }
+
+  /* waiting: [{id, scheduled:'09:20', arrived:'09:05'}] in call order.
+     current: {startedAt:'09:31'} or null. Returns an ETA per patient plus
+     the doctor's running delay in minutes.                                  */
+  function predictQueue(input) {
+    const now = input.nowMinutes;
+    const avg = input.avgConsultMinutes || 15;
+    let cursor = now;
+    if (input.current && input.current.startedAt != null) {
+      const started = minutesOf(input.current.startedAt);
+      const elapsed = Math.max(0, now - started);
+      cursor = now + Math.max(2, avg - elapsed);          // never promise "right now"
+    }
+    const out = (input.waiting || []).map(function (p) {
+      const eta = cursor;
+      cursor += avg;
+      const sched = minutesOf(p.scheduled);
+      return { id: p.id, etaMinutes: eta, eta: hhmmOf(eta),
+               delayMinutes: sched == null ? 0 : Math.max(0, Math.round(eta - sched)),
+               position: 0 };
+    });
+    out.forEach((o, i) => { o.position = i + 1; });
+    const delay = out.length ? Math.max.apply(null, out.map(o => o.delayMinutes)) : 0;
+    return { queue: out, doctorDelayMinutes: delay,
+             status: delay >= 30 ? "heavily_delayed" : delay >= 15 ? "delayed" : "on_time" };
+  }
+
+  /* ---------------------------------------------------------------------
+     Patient messaging. Templates are data, not code, so a clinic can edit
+     the wording without touching the flow.
+     --------------------------------------------------------------------- */
+  const TEMPLATES = {
+    booked: {
+      en: "Hello {name}, your appointment with {doctor} ({dept}) is confirmed for {date} at {time} at {centre}. Reply CANCEL to cancel.",
+      ar: "مرحباً {name}، تم تأكيد موعدك مع {doctor} ({dept}) يوم {date} الساعة {time} في {centre}. للإلغاء أرسل CANCEL."
+    },
+    reminder: {
+      en: "Reminder: {name}, you have an appointment tomorrow at {time} with {doctor}. Please bring your QID and insurance card.",
+      ar: "تذكير: {name}، لديك موعد غداً الساعة {time} مع {doctor}. يرجى إحضار البطاقة الشخصية وبطاقة التأمين."
+    },
+    checked_in: {
+      en: "{name}, you are checked in. Queue number {position}. Estimated time to be seen: {eta}.",
+      ar: "{name}، تم تسجيل حضورك. رقمك في الانتظار {position}. الوقت المتوقع للدخول: {eta}."
+    },
+    doctor_delay: {
+      en: "{name}, {doctor} is running about {delay} minutes behind. Your new estimated time is {eta}. Sorry for the wait.",
+      ar: "{name}، {doctor} متأخر حوالي {delay} دقيقة. الوقت المتوقع الجديد {eta}. نعتذر عن التأخير."
+    },
+    you_are_next: {
+      en: "{name}, you are next. Please come to room {room}.",
+      ar: "{name}، أنت التالي. يرجى التوجه إلى غرفة {room}."
+    },
+    called: {
+      en: "{name}, please proceed to room {room} for {doctor} now.",
+      ar: "{name}، يرجى التوجه الآن إلى غرفة {room} عند {doctor}."
+    },
+    bill_ready: {
+      en: "{name}, your visit is complete. Amount due {amount}. Pay at the cashier or on this link: {link}",
+      ar: "{name}، انتهت زيارتك. المبلغ المستحق {amount}. الدفع في الصندوق أو عبر الرابط: {link}"
+    },
+    paid: {
+      en: "Thank you {name}. We received {amount}. Your receipt {ref} is attached to your file.",
+      ar: "شكراً {name}. استلمنا {amount}. إيصالك {ref} محفوظ في ملفك."
+    },
+    eligibility_failed: {
+      en: "{name}, your insurance card could not be verified ({reason}). Today's visit will be self-paid. Please contact your insurer.",
+      ar: "{name}، تعذر التحقق من بطاقة التأمين ({reason}). زيارة اليوم ستكون دفعاً ذاتياً. يرجى التواصل مع شركة التأمين."
+    },
+    approval_pending: {
+      en: "{name}, we have requested insurer approval for {service}. We will message you as soon as it is decided.",
+      ar: "{name}، تم طلب موافقة التأمين على {service}. سنبلغك فور صدور القرار."
+    },
+    approval_granted: {
+      en: "{name}, your insurer approved {service}. You can book the procedure at your convenience.",
+      ar: "{name}، وافق التأمين على {service}. يمكنك حجز الإجراء في الوقت المناسب لك."
+    },
+    results_ready: {
+      en: "{name}, your {service} results are ready. Log in to the patient portal or collect from reception.",
+      ar: "{name}، نتائج {service} جاهزة. يمكنك الاطلاع عبر البوابة أو الاستلام من الاستقبال."
+    },
+    no_show: {
+      en: "{name}, we missed you at {time} today. Reply BOOK to be offered the next available slot with {doctor}.",
+      ar: "{name}، لم نرك في موعد {time} اليوم. أرسل BOOK لنعرض عليك أقرب موعد متاح مع {doctor}."
+    },
+    recall: {
+      en: "{name}, {doctor} asked us to remind you that your {service} follow-up is due. Reply BOOK to arrange it.",
+      ar: "{name}، يذكّرك {doctor} بموعد المتابعة الخاص بـ {service}. أرسل BOOK للحجز."
+    }
+  };
+
+  function renderTemplate(key, lang, vars) {
+    const t = TEMPLATES[key]; if (!t) return "";
+    const body = t[lang] || t.en;
+    return body.replace(/\{(\w+)\}/g, function (_, k) {
+      return vars && vars[k] != null ? String(vars[k]) : "";
+    });
+  }
+
+  /* GSM-03.38 segmentation: what the clinic is actually billed for.
+     Arabic falls to UCS-2, which is 70 characters a part, not 160.        */
+  function smsParts(body) {
+    const unicode = /[^\x00-\x7F€£¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉÄÖÑÜ§¿äöñüà\n\r]/.test(body);
+    const single = unicode ? 70 : 160, multi = unicode ? 67 : 153;
+    const len = body.length;
+    return { encoding: unicode ? "UCS-2" : "GSM-7", length: len,
+             parts: len <= single ? 1 : Math.ceil(len / multi) };
+  }
+
+
+  /* Builders — used by the kiosk demo and by the tests to produce documents
+     with genuine check digits, so nothing is validated against a fake. */
+  function pad(v, n) { return String(v || "").toUpperCase().replace(/[^A-Z0-9<]/g, "<").padEnd(n, "<").slice(0, n); }
+  function nameField(surname, given, n) {
+    return pad(String(surname).toUpperCase().replace(/[^A-Z]/g, "<") + "<<" +
+               String(given).toUpperCase().replace(/[^A-Z ]/g, "").trim().replace(/ /g, "<"), n);
+  }
+  function buildTD3(f) {
+    const l1 = "P<" + pad(f.issuer, 3) + nameField(f.surname, f.givenNames, 39);
+    const doc = pad(f.documentNumber, 9), opt = pad(f.optionalData || "", 14);
+    const body = doc + mrzCheckDigit(doc) + pad(f.nationality, 3) + f.dob + mrzCheckDigit(f.dob) +
+                 f.sex + f.expiry + mrzCheckDigit(f.expiry) + opt + mrzCheckDigit(opt);
+    const comp = body.slice(0, 10) + body.slice(13, 20) + body.slice(21, 43);
+    return [l1, body + mrzCheckDigit(comp)];
+  }
+  function buildTD1(f) {
+    const doc = pad(f.documentNumber, 9);
+    const l1 = pad(f.documentType || "ID", 2) + pad(f.issuer, 3) + doc + mrzCheckDigit(doc) + pad(f.optional1 || "", 15);
+    const l2body = f.dob + mrzCheckDigit(f.dob) + f.sex + f.expiry + mrzCheckDigit(f.expiry) +
+                   pad(f.nationality, 3) + pad(f.optional2 || "", 11);
+    const comp = l1.slice(5, 30) + l2body.slice(0, 7) + l2body.slice(8, 15) + l2body.slice(18, 29);
+    return [l1, l2body + mrzCheckDigit(comp), nameField(f.surname, f.givenNames, 30)];
+  }
+
+  return { round2, validateQID, validateQatarPhone, nextMRN, ageFrom, checkEligibility,
+           mrzCheckDigit, mrzVerify, parseMRZ, parseTD1, parseTD3, mrzDate, mrzNames, nationalityName,
+           predictQueue, minutesOf, hhmmOf, renderTemplate, smsParts, TEMPLATES, buildTD1, buildTD3,
+           splitBill, postingsForBill, postingsForSettlement, isBalanced, daysBetween,
+           agingBucket, STAGES, stageIndex, canAdvance, ACC };
+})();
+/* ENGINE-END */
+
+/* ------------------------- seed data ------------------------- */
+const iso = d => new Date(d).toISOString().slice(0, 10);
+const TODAY = iso(new Date());
+const daysAgo = n => iso(new Date(Date.now() - n * 86400000));
+
+const DB = {
+  centre: { en: "Al Noor Medical Centre", ar: "مركز النور الطبي",
+            licence: "MOPH/PHC/2019/0442", trn: "5001234567", phone: "+974 4444 7788",
+            addr: { en: "Al Sadd, Zone 38, Street 850, Doha", ar: "السد، منطقة ٣٨، شارع ٨٥٠، الدوحة" } },
+
+  departments: [
+    { id: "GEN", en: "General Medicine", ar: "الطب العام" },
+    { id: "DENT", en: "Dental", ar: "الأسنان" },
+    { id: "DERM", en: "Dermatology", ar: "الجلدية" },
+    { id: "PED", en: "Paediatrics", ar: "الأطفال" },
+    { id: "OBG", en: "Obstetrics & Gynaecology", ar: "النساء والولادة" },
+    { id: "ORT", en: "Orthopaedics", ar: "العظام" },
+    { id: "LAB", en: "Laboratory", ar: "المختبر" },
+    { id: "RAD", en: "Radiology", ar: "الأشعة" }
+  ],
+
+  doctors: [
+    { id: "D1", en: "Dr Huda Al-Mansoori", ar: "د. هدى المنصوري", dept: "GEN", dhp: "DHP-GP-22841", fee: 150, room: "104" },
+    { id: "D2", en: "Dr Samir Haddad", ar: "د. سمير حداد", dept: "GEN", dhp: "DHP-GP-19077", fee: 150, room: "106" },
+    { id: "D3", en: "Dr Reem Al-Kuwari", ar: "د. ريم الكواري", dept: "DENT", dhp: "DHP-DN-30115", fee: 180, room: "201" },
+    { id: "D4", en: "Dr Anand Menon", ar: "د. أناند مينون", dept: "DERM", dhp: "DHP-DR-27604", fee: 250, room: "203" },
+    { id: "D5", en: "Dr Fatima Osman", ar: "د. فاطمة عثمان", dept: "PED", dhp: "DHP-PD-25530", fee: 220, room: "108" },
+    { id: "D6", en: "Dr Yousef Barakat", ar: "د. يوسف بركات", dept: "ORT", dhp: "DHP-OR-21998", fee: 280, room: "205" },
+    { id: "D7", en: "Dr Leila Chahine", ar: "د. ليلى شاهين", dept: "OBG", dhp: "DHP-OB-24413", fee: 260, room: "207" }
+  ],
+
+  /* type drives the billing rule: consult = flat co-pay, everything else = co-insurance */
+  services: [
+    { code: "CON-GP", en: "General consultation", ar: "كشف عام", type: "consult", dept: "GEN", price: 150 },
+    { code: "CON-FU", en: "Follow-up consultation", ar: "مراجعة", type: "consult", dept: "GEN", price: 75 },
+    { code: "CON-SPC", en: "Specialist consultation", ar: "كشف أخصائي", type: "consult", dept: "DERM", price: 250 },
+    { code: "CON-DEN", en: "Dental consultation", ar: "كشف أسنان", type: "consult", dept: "DENT", price: 180 },
+    { code: "LAB-CBC", en: "Complete blood count", ar: "صورة دم كاملة", type: "lab", dept: "LAB", price: 60 },
+    { code: "LAB-A1C", en: "HbA1c", ar: "السكر التراكمي", type: "lab", dept: "LAB", price: 90 },
+    { code: "LAB-LFT", en: "Liver function panel", ar: "وظائف الكبد", type: "lab", dept: "LAB", price: 120 },
+    { code: "LAB-VTD", en: "Vitamin D", ar: "فيتامين د", type: "lab", dept: "LAB", price: 180 },
+    { code: "LAB-URN", en: "Urine routine", ar: "تحليل بول", type: "lab", dept: "LAB", price: 45 },
+    { code: "LAB-LIP", en: "Lipid profile", ar: "الدهون", type: "lab", dept: "LAB", price: 110 },
+    { code: "RAD-XR", en: "X-ray, single view", ar: "أشعة سينية", type: "radiology", dept: "RAD", price: 200 },
+    { code: "RAD-USG", en: "Ultrasound abdomen", ar: "سونار بطن", type: "radiology", dept: "RAD", price: 300 },
+    { code: "RAD-MRI", en: "MRI, one region", ar: "رنين مغناطيسي", type: "radiology", dept: "RAD", price: 1400 },
+    { code: "PRC-DRS", en: "Wound dressing", ar: "تضميد جرح", type: "procedure", dept: "GEN", price: 80 },
+    { code: "PRC-SUT", en: "Suturing, minor", ar: "خياطة جرح", type: "procedure", dept: "GEN", price: 250 },
+    { code: "PRC-IVF", en: "IV fluids and observation", ar: "محاليل وريدية", type: "procedure", dept: "GEN", price: 190 },
+    { code: "PRC-NEB", en: "Nebulisation", ar: "جلسة استنشاق", type: "procedure", dept: "PED", price: 90 },
+    { code: "DEN-SCL", en: "Scaling and polishing", ar: "تنظيف الأسنان", type: "dental", dept: "DENT", price: 250 },
+    { code: "DEN-FIL", en: "Composite filling", ar: "حشو تجميلي", type: "dental", dept: "DENT", price: 350 },
+    { code: "DEN-RCT", en: "Root canal treatment", ar: "علاج عصب", type: "dental", dept: "DENT", price: 950 },
+    { code: "PHR-ANB", en: "Antibiotic course", ar: "مضاد حيوي", type: "pharmacy", dept: "GEN", price: 85 },
+    { code: "PHR-ANL", en: "Analgesic pack", ar: "مسكنات", type: "pharmacy", dept: "GEN", price: 40 },
+    { code: "VAC-FLU", en: "Influenza vaccine", ar: "لقاح الإنفلونزا", type: "vaccine", dept: "GEN", price: 120 }
+  ],
+
+  insurers: [
+    { id: "QLM", en: "QLM Health Insurance", ar: "كيو إل إم للتأمين الصحي", tpa: "Direct",
+      plans: [
+        { code: "GOLD", en: "Gold", ar: "ذهبية", coinsurance: 0.10, copayConsult: 25, deductible: 0, annualLimit: 150000, approvalThreshold: 1000, exclusions: [] },
+        { code: "SILVER", en: "Silver", ar: "فضية", coinsurance: 0.20, copayConsult: 50, deductible: 300, annualLimit: 60000, approvalThreshold: 600, exclusions: ["dental"] }
+      ] },
+    { id: "QIC", en: "Qatar Insurance Company", ar: "قطر للتأمين", tpa: "NAS Administration Services",
+      plans: [
+        { code: "A", en: "Class A", ar: "الفئة أ", coinsurance: 0.10, copayConsult: 30, deductible: 0, annualLimit: 120000, approvalThreshold: 800, exclusions: [] },
+        { code: "C", en: "Class C", ar: "الفئة ج", coinsurance: 0.25, copayConsult: 60, deductible: 500, annualLimit: 40000, approvalThreshold: 500, exclusions: ["dental", "vaccine"] }
+      ] },
+    { id: "DIG", en: "Doha Insurance Group", ar: "مجموعة الدوحة للتأمين", tpa: "NextCare",
+      plans: [
+        { code: "PLUS", en: "Plus", ar: "بلس", coinsurance: 0.15, copayConsult: 40, deductible: 200, annualLimit: 80000, approvalThreshold: 700, exclusions: [] }
+      ] },
+    { id: "GIG", en: "GIG Gulf", ar: "جي آي جي الخليج", tpa: "MedNet Qatar",
+      plans: [
+        { code: "EXEC", en: "Executive", ar: "تنفيذية", coinsurance: 0.05, copayConsult: 0, deductible: 0, annualLimit: 250000, approvalThreshold: 1500, exclusions: [] },
+        { code: "STD", en: "Standard", ar: "قياسية", coinsurance: 0.20, copayConsult: 50, deductible: 400, annualLimit: 50000, approvalThreshold: 600, exclusions: ["dental"] }
+      ] }
+  ],
+
+  icd10: [
+    { code: "J06.9", en: "Acute upper respiratory infection", ar: "التهاب تنفسي علوي حاد" },
+    { code: "E11.9", en: "Type 2 diabetes mellitus", ar: "السكري من النوع الثاني" },
+    { code: "I10", en: "Essential hypertension", ar: "ارتفاع ضغط الدم" },
+    { code: "K21.0", en: "Gastro-oesophageal reflux", ar: "ارتجاع المريء" },
+    { code: "M54.5", en: "Low back pain", ar: "ألم أسفل الظهر" },
+    { code: "L20.9", en: "Atopic dermatitis", ar: "التهاب الجلد التأتبي" },
+    { code: "J45.9", en: "Asthma, unspecified", ar: "الربو" },
+    { code: "D50.9", en: "Iron deficiency anaemia", ar: "فقر دم بنقص الحديد" },
+    { code: "N39.0", en: "Urinary tract infection", ar: "التهاب المسالك البولية" },
+    { code: "K02.9", en: "Dental caries", ar: "تسوس الأسنان" },
+    { code: "Z00.0", en: "General medical examination", ar: "فحص طبي عام" }
+  ],
+
+  patients: [], appointments: [], visits: [], claims: [], payments: [], journal: [],
+  seq: { mrn: 1, visit: 1, claim: 1, appt: 1, jv: 1 }
+};
+
+const SLOT_TIMES = ["08:00","08:20","08:40","09:00","09:20","09:40","10:00","10:20","10:40",
+                    "11:00","11:20","11:40","16:00","16:20","16:40","17:00","17:20","17:40",
+                    "18:00","18:20","18:40","19:00","19:20","19:40"];
+
+const ROLES = [
+  { id: "admin",   en: "Administrator", ar: "مدير النظام", init: "MI" },
+  { id: "reception", en: "Reception", ar: "الاستقبال", init: "RC" },
+  { id: "doctor",  en: "Doctor", ar: "طبيب", init: "DR" },
+  { id: "cashier", en: "Cashier", ar: "الصندوق", init: "CS" },
+  { id: "finance", en: "Finance", ar: "المالية", init: "FN" }
+];
+let ROLE = "admin";
+
+/* ------------------------- helpers ------------------------- */
+const E = ClinicEngine;
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const qar = n => (LANG === "ar" ? "" : "") + Number(n || 0).toLocaleString(LANG === "ar" ? "ar-QA" : "en-QA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " " + T("qar");
+const dept = id => DB.departments.find(d => d.id === id);
+const doc = id => DB.doctors.find(d => d.id === id);
+const svc = c => DB.services.find(s => s.code === c);
+const insurer = id => DB.insurers.find(i => i.id === id);
+const planOf = (insId, code) => { const i = insurer(insId); return i ? i.plans.find(p => p.code === code) : null; };
+const pt = mrn => DB.patients.find(p => p.mrn === mrn);
+const visit = id => DB.visits.find(v => v.id === id);
+const sum = (a, f) => a.reduce((s, x) => s + (f ? f(x) : x), 0);
+
+function toast(msg, bad) {
+  const el = document.createElement("div");
+  el.className = "toast" + (bad ? " bad" : ""); el.textContent = msg;
+  $("#toastHost").appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+function post(ref, memo, lines, date) {
+  if (!E.isBalanced(lines)) { console.error("Unbalanced journal entry", ref, lines); }
+  DB.journal.push({ id: "JV-" + String(DB.seq.jv++).padStart(4, "0"), date: date || TODAY, ref, memo, lines });
+}
+
+/* ------------------------- operations (the flow) ------------------------- */
+function registerPatient(data) {
+  const mrn = E.nextMRN(DB.seq.mrn++);
+  const p = Object.assign({ mrn, created: TODAY, stage: "registered" }, data);
+  DB.patients.push(p);
+  return p;
+}
+
+function bookAppointment(mrn, doctorId, date, time) {
+  const a = { id: "APT-" + String(DB.seq.appt++).padStart(4, "0"), mrn, doctorId, date, time, status: "booked" };
+  DB.appointments.push(a);
+  const v = {
+    id: "V-" + String(DB.seq.visit++).padStart(5, "0"),
+    mrn, doctorId, deptId: doc(doctorId).dept, date, time, apptId: a.id,
+    stage: "booked", vitals: {}, complaint: "", notes: "", dx: [], items: [],
+    bill: null, payments: [], claimId: null, checkedInAt: null, calledAt: null
+  };
+  DB.visits.push(v);
+  a.visitId = v.id;
+  return v;
+}
+
+function checkIn(v) {
+  v.stage = "checked_in";
+  v.checkedInAt = new Date().toTimeString().slice(0, 5);
+  const a = DB.appointments.find(x => x.id === v.apptId); if (a) a.status = "arrived";
+  /* eligibility is verified at the door, not at the till */
+  const p = pt(v.mrn);
+  const pl = p.insurance ? planOf(p.insurance.insurerId, p.insurance.plan) : null;
+  v.eligibility = E.checkEligibility(p.insurance, pl, TODAY);
+  return v;
+}
+
+function callPatient(v) { v.stage = "in_consult"; v.calledAt = new Date().toTimeString().slice(0, 5); return v; }
+
+function addItem(v, code, qty) {
+  const s = svc(code); if (!s) return;
+  const ex = v.items.find(i => i.code === code);
+  if (ex) { ex.qty += (qty || 1); return; }
+  v.items.push({ code, name: s.en, nameAr: s.ar, type: s.type, price: s.price, qty: qty || 1, approved: false });
+}
+
+function buildBill(v) {
+  const p = pt(v.mrn);
+  const pl = p.insurance ? planOf(p.insurance.insurerId, p.insurance.plan) : null;
+  const elig = v.eligibility ? v.eligibility.eligible : (p.insurance ? E.checkEligibility(p.insurance, pl, TODAY).eligible : false);
+  return E.splitBill({
+    items: v.items.map(i => ({ code: i.code, name: L({ en: i.name, ar: i.nameAr }), type: i.type, price: i.price, qty: i.qty, approved: i.approved })),
+    plan: pl, eligible: elig,
+    usage: p.insurance ? { deductibleUsed: p.insurance.deductibleUsed || 0, limitUsed: p.insurance.limitUsed || 0 } : {}
+  });
+}
+
+function sendToCashier(v) { v.stage = "ready_to_bill"; v.bill = buildBill(v); return v; }
+
+function collect(v, method, tendered) {
+  const b = v.bill || buildBill(v);
+  const p = pt(v.mrn);
+  const paid = E.round2(Math.min(tendered == null ? b.totals.patient : tendered, b.totals.patient));
+  v.payments.push({ date: TODAY, method, amount: paid, ref: "RCT-" + v.id.slice(2) });
+  DB.payments.push({ date: TODAY, visitId: v.id, mrn: v.mrn, method, amount: paid, deptId: v.deptId, doctorId: v.doctorId });
+  v.stage = "paid"; v.billedAt = TODAY; v.bill = b;
+
+  if (p.insurance && b.totals.insurance > 0) {           // insurer usage is consumed at billing
+    p.insurance.deductibleUsed = b.usageAfter.deductibleUsed;
+    p.insurance.limitUsed = b.usageAfter.limitUsed;
+  }
+  post(v.id, "Visit billing — " + v.mrn,
+       E.postingsForBill({ gross: b.totals.gross, insurance: b.totals.insurance,
+                           patient: b.totals.patient, patientPaid: paid, method }), TODAY);
+
+  if (b.totals.insurance > 0 && p.insurance) {
+    const c = { id: "CLM-" + String(DB.seq.claim++).padStart(4, "0"), visitId: v.id, mrn: v.mrn,
+                insurerId: p.insurance.insurerId, plan: p.insurance.plan, policyNo: p.insurance.policyNo,
+                amount: b.totals.insurance, status: "draft", created: TODAY, submitted: null,
+                settled: 0, rejectReason: "", dx: v.dx.slice() };
+    DB.claims.push(c); v.claimId = c.id;
+  }
+  return v;
+}
+
+function submitClaim(c) { c.status = "submitted"; c.submitted = TODAY; const v = visit(c.visitId); if (v) v.stage = "claimed"; }
+
+function settleClaim(c, settled, reason) {
+  const s = E.round2(settled);
+  c.settled = s;
+  c.status = s <= 0 ? "rejected" : (s < c.amount ? "part" : "paid");
+  c.rejectReason = reason || "";
+  c.settledOn = TODAY;
+  post(c.id, "Insurer settlement — " + (insurer(c.insurerId) || {}).en, E.postingsForSettlement(c.amount, s), TODAY);
+}
+
+/* ------------------------- demo seeding ------------------------- */
+function seedDemo() {
+  const people = [
+    { en: "Mariam Al-Sulaiti", ar: "مريم السليطي", qid: "28634500912", hc: "HC-0442118", dob: "1986-03-14", sex: "F", nat: "Qatari", phone: "33418822",
+      ins: { insurerId: "QLM", plan: "GOLD", policyNo: "QLM-88213", cardNo: "8821345009", expiry: iso(new Date(Date.now() + 240 * 86400000)), active: true, deductibleUsed: 0, limitUsed: 3200 } },
+    { en: "Rajesh Kumar Nair", ar: "راجيش كومارناير", qid: "27835601144", hc: "HC-0518907", dob: "1978-11-02", sex: "M", nat: "Indian", phone: "55207744",
+      ins: { insurerId: "QIC", plan: "C", policyNo: "QIC-4471-09", cardNo: "4471099002", expiry: iso(new Date(Date.now() + 90 * 86400000)), active: true, deductibleUsed: 150, limitUsed: 8400 } },
+    { en: "Aisha Abdelrahman", ar: "عائشة عبدالرحمن", qid: "29241800377", hc: "HC-0611233", dob: "1992-07-21", sex: "F", nat: "Sudanese", phone: "66330091",
+      ins: { insurerId: "DIG", plan: "PLUS", policyNo: "DIG-77120", cardNo: "7712004411", expiry: iso(new Date(Date.now() + 15 * 86400000)), active: true, deductibleUsed: 200, limitUsed: 1100 } },
+    { en: "John Mensah", ar: "جون مينسا", qid: "28140200655", hc: "HC-0399014", dob: "1981-01-30", sex: "M", nat: "Ghanaian", phone: "70119933",
+      ins: null },
+    { en: "Noura Al-Hajri", ar: "نورة الهاجري", qid: "30012700488", hc: "HC-0722560", dob: "2000-09-09", sex: "F", nat: "Qatari", phone: "55884411",
+      ins: { insurerId: "GIG", plan: "EXEC", policyNo: "GIG-EX-2210", cardNo: "2210559088", expiry: iso(new Date(Date.now() + 300 * 86400000)), active: true, deductibleUsed: 0, limitUsed: 12750 } },
+    { en: "Ahmed Fathy Ibrahim", ar: "أحمد فتحي إبراهيم", qid: "27553900211", hc: "HC-0287441", dob: "1975-05-18", sex: "M", nat: "Egyptian", phone: "33902255",
+      ins: { insurerId: "GIG", plan: "STD", policyNo: "GIG-ST-9014", cardNo: "9014220117", expiry: daysAgo(12), active: true, deductibleUsed: 400, limitUsed: 6600 } },
+    { en: "Fatima Zahra Bennani", ar: "فاطمة الزهراء بناني", qid: "29648300122", hc: "HC-0655102", dob: "1996-12-04", sex: "F", nat: "Moroccan", phone: "50441177",
+      ins: { insurerId: "QLM", plan: "SILVER", policyNo: "QLM-55440", cardNo: "5544001299", expiry: iso(new Date(Date.now() + 120 * 86400000)), active: true, deductibleUsed: 0, limitUsed: 900 } }
+  ];
+  people.forEach(p => registerPatient({
+    en: p.en, ar: p.ar, qid: p.qid, healthCard: p.hc, dob: p.dob, sex: p.sex, nationality: p.nat,
+    phone: "+974 " + p.phone.slice(0, 4) + " " + p.phone.slice(4), email: "",
+    address: "Al Sadd, Doha", insurance: p.ins
+  }));
+
+  /* historical, fully closed visits so Finance opens with real numbers */
+  const hist = [
+    [0, "D1", ["CON-GP", "LAB-CBC", "PHR-ANB"], 3, "cash"],
+    [1, "D4", ["CON-SPC", "PHR-ANL"], 5, "card"],
+    [2, "D3", ["CON-DEN", "DEN-SCL"], 9, "card"],
+    [4, "D5", ["CON-GP", "PRC-NEB"], 12, "cash"],
+    [0, "D2", ["CON-GP", "LAB-A1C", "LAB-LIP"], 18, "naps"],
+    [6, "D6", ["CON-SPC", "RAD-XR"], 21, "card"],
+    [2, "D1", ["CON-FU", "LAB-URN"], 26, "cash"],
+    [4, "D7", ["CON-SPC", "RAD-USG"], 33, "card"],
+    [1, "D2", ["CON-GP", "LAB-LFT"], 41, "naps"],
+    [5, "D4", ["CON-SPC", "DEN-FIL"], 48, "card"],
+    [3, "D1", ["CON-GP", "PRC-DRS"], 55, "cash"],
+    [0, "D5", ["CON-GP", "VAC-FLU"], 62, "card"]
+  ];
+  hist.forEach(h => {
+    const p = DB.patients[h[0]], d = h[1], codes = h[2], ago = h[3], method = h[4];
+    const date = daysAgo(ago);
+    const v = bookAppointment(p.mrn, d, date, "09:00");
+    v.date = date; v.stage = "in_consult";
+    const pl = p.insurance ? planOf(p.insurance.insurerId, p.insurance.plan) : null;
+    v.eligibility = E.checkEligibility(p.insurance, pl, date);
+    codes.forEach(c => addItem(v, c, 1));
+    v.items.forEach(i => { i.approved = true; });
+    v.dx = [DB.icd10[ago % DB.icd10.length].code];
+    sendToCashier(v); collect(v, method, null);
+    v.billedAt = date;
+    DB.payments[DB.payments.length - 1].date = date;
+    DB.journal[DB.journal.length - 1].date = date;
+    if (v.claimId) {
+      const c = DB.claims.find(x => x.id === v.claimId);
+      c.created = date;
+      if (ago > 7) { submitClaim(c); c.submitted = date; }
+      if (ago > 35) { const short = ago > 55 ? c.amount * 0.12 : 0;
+        settleClaim(c, E.round2(c.amount - short), short ? "Service LAB-LFT outside plan schedule" : "");
+        c.settledOn = daysAgo(ago - 28);
+        DB.journal[DB.journal.length - 1].date = c.settledOn; }
+    }
+  });
+
+  /* today's floor: one of each stage so the journey is visible immediately */
+  const t1 = bookAppointment(DB.patients[1].mrn, "D1", TODAY, "09:00"); checkIn(t1);
+  const t2 = bookAppointment(DB.patients[2].mrn, "D4", TODAY, "09:20"); checkIn(t2);
+  const t3 = bookAppointment(DB.patients[5].mrn, "D1", TODAY, "09:40"); checkIn(t3); callPatient(t3);
+  addItem(t3, "CON-GP", 1); addItem(t3, "LAB-CBC", 1);
+  const t4 = bookAppointment(DB.patients[0].mrn, "D3", TODAY, "10:00"); checkIn(t4); callPatient(t4);
+  addItem(t4, "CON-DEN", 1); addItem(t4, "DEN-RCT", 1);
+  t4.dx = ["K02.9"]; t4.complaint = "Pain in lower right molar for four days";
+  sendToCashier(t4);
+  bookAppointment(DB.patients[4].mrn, "D7", TODAY, "16:20");
+  bookAppointment(DB.patients[6].mrn, "D5", TODAY, "17:00");
+}
+seedDemo();
+
+/* ------------------------- router & chrome ------------------------- */
+let VIEW = { name: "dash", mrn: null, visitId: null, apptDate: TODAY, apptDoctor: "D1", search: "", finFrom: daysAgo(30), finTo: TODAY };
+
+const NAV = [
+  { grp: "g_front", items: [["dash","nav_dash"],["patients","nav_patients"],["appts","nav_appts"],["queue","nav_queue"]] },
+  { grp: "g_clinical", items: [["consult","nav_consult"]] },
+  { grp: "g_money", items: [["billing","nav_billing"],["claims","nav_claims"],["finance","nav_finance"]] },
+  { grp: "g_setup", items: [["masters","nav_masters"]] }
+];
+
+function counts() {
+  return {
+    queue: DB.visits.filter(v => v.stage === "checked_in").length,
+    consult: DB.visits.filter(v => v.stage === "in_consult").length,
+    bill: DB.visits.filter(v => v.stage === "ready_to_bill").length,
+    claims: DB.claims.filter(c => c.status === "draft").length
+  };
+}
+
+function renderNav() {
+  const c = counts();
+  const badge = { queue: c.queue, consult: c.consult, billing: c.bill, claims: c.claims };
+  $("#nav").innerHTML = NAV.map(g =>
+    '<div class="grp">' + T(g.grp) + "</div>" +
+    g.items.map(([id, lab]) =>
+      '<button data-act="go" data-v="' + id + '" class="' + (VIEW.name === id ? "on" : "") + '">' +
+      esc(T(lab)) + (badge[id] ? '<span class="tag num">' + badge[id] + "</span>" : "") + "</button>").join("")
+  ).join("");
+  $("#railFoot").innerHTML = esc(L(DB.centre)) + "<br>" + esc(T("branch")) + " · " + esc(DB.centre.licence);
+  $("#brandSub").innerHTML = LANG === "ar" ? "إدارة المراكز الطبية<br>الدوحة، قطر" : "Medical Centre Management<br>Doha, Qatar";
+  $("#roleSel").innerHTML = ROLES.map(r => '<option value="' + r.id + '"' + (r.id === ROLE ? " selected" : "") + ">" + esc(L(r)) + "</option>").join("");
+  $("#avatar").textContent = (ROLES.find(r => r.id === ROLE) || {}).init || "??";
+  $("#langBtn").textContent = T("other");
+  $("#clock").textContent = new Date().toLocaleDateString(LANG === "ar" ? "ar-QA" : "en-GB",
+    { weekday: "long", day: "numeric", month: "long", year: "numeric" }) + " · " + L(DB.centre);
+}
+
+function ribbon(stage) {
+  const idx = E.stageIndex(stage);
+  return '<div class="ribbon">' + E.STAGES.map((s, i) =>
+    '<div class="stg ' + (i < idx ? "done" : i === idx ? "now" : "") + '">' +
+    '<div class="n num">' + (i + 1) + "</div><div class=\"t\">" + esc(T("st_" + s)) + "</div></div>").join("") + "</div>";
+}
+
+function head(t, s, right) {
+  return '<div class="pagehead"><div><h1>' + esc(T(t)) + "</h1><p>" + esc(T(s)) + "</p></div>" +
+    (right ? '<div class="spacer"></div><div class="noprint">' + right + "</div>" : "") + "</div>";
+}
+
+function go(name, extra) { Object.assign(VIEW, { name }, extra || {}); render(); window.scrollTo(0, 0); }
+
+function render() {
+  renderNav();
+  const v = $("#view");
+  const map = { dash: viewDash, patients: viewPatients, patient: viewPatient, appts: viewAppts,
+                queue: viewQueue, consult: viewConsult, billing: viewBilling, claims: viewClaims,
+                finance: viewFinance, masters: viewMasters };
+  v.innerHTML = (map[VIEW.name] || viewDash)();
+}
+
+/* ------------------------- dashboard ------------------------- */
+function viewDash() {
+  const today = DB.visits.filter(v => v.date === TODAY);
+  const collectedToday = sum(DB.payments.filter(p => p.date === TODAY), p => p.amount);
+  const receivable = sum(DB.claims.filter(c => c.status === "draft" || c.status === "submitted"), c => c.amount) +
+                     sum(DB.claims.filter(c => c.status === "part"), c => c.amount - c.settled);
+  const pendingClaims = DB.claims.filter(c => c.status === "submitted").length;
+  const waiting = DB.visits.filter(v => v.stage === "checked_in");
+
+  const kpi = (cls, lab, val, foot) =>
+    '<div class="kpi ' + cls + '"><div class="lab">' + esc(T(lab)) + '</div><div class="val num">' + val +
+    '</div><div class="foot">' + esc(foot) + "</div></div>";
+
+  const rows = today.filter(v => E.stageIndex(v.stage) >= 2).sort((a, b) => (a.time || "").localeCompare(b.time || "")).map(v => {
+    const p = pt(v.mrn), d = doc(v.doctorId);
+    return '<tr class="click" data-act="open-visit" data-id="' + v.id + '"><td class="num">' + esc(v.time) + "</td><td>" +
+      esc(L(p)) + '<div class="mini num">' + esc(v.mrn) + "</div></td><td>" + esc(L(d)) +
+      '<div class="mini">' + esc(L(dept(v.deptId))) + '</div></td><td>' + stagePill(v.stage) + "</td>" +
+      '<td class="r">' + (v.bill ? '<span class="money">' + qar(v.bill.totals.gross) + "</span>" : '<span class="mini">—</span>') + "</td></tr>";
+  }).join("");
+
+  return head("dash_t", "dash_s") +
+    '<div class="grid g3" style="margin-bottom:16px">' +
+      kpi("", "k_patients", today.length, DB.departments.length + (LANG === "ar" ? " أقسام" : " departments open")) +
+      kpi("maroon", "k_waiting", waiting.length, counts().consult + (LANG === "ar" ? " مع الطبيب" : " with a doctor now")) +
+      kpi("teal", "k_collected", qar(collectedToday), DB.payments.filter(p => p.date === TODAY).length + (LANG === "ar" ? " إيصال" : " receipts")) +
+    "</div>" +
+    '<div class="grid g2">' +
+      '<div class="card"><header><h3>' + esc(LANG === "ar" ? "حركة اليوم" : "Movement today") + "</h3></header>" +
+      (rows ? "<table><thead><tr><th>" + esc(T("time")) + "</th><th>" + esc(T("pt_of")) + "</th><th>" + esc(T("dr_of")) +
+       "</th><th>" + esc(T("status")) + '</th><th class="r">' + esc(T("amount")) + "</th></tr></thead><tbody>" + rows + "</tbody></table>"
+       : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>" +
+      '<div>' +
+        '<div class="grid" style="gap:16px">' +
+          kpi("amber", "k_recv", qar(receivable), pendingClaims + (LANG === "ar" ? " مطالبة قيد السداد" : " claims awaiting settlement")) +
+          '<div class="card"><header><h3>' + esc(LANG === "ar" ? "قائمة الانتظار" : "Waiting room") + "</h3>" +
+          '<button class="btn ghost sm" data-act="go" data-v="queue">' + esc(T("nav_queue")) + "</button></header>" +
+          (waiting.length ? '<div class="body" style="padding:8px 0">' + waiting.map(v => {
+            const p = pt(v.mrn);
+            return '<div style="display:flex;gap:10px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line-2)">' +
+              '<div style="flex:1"><div>' + esc(L(p)) + '</div><div class="mini">' + esc(L(doc(v.doctorId))) + " · " + esc(v.checkedInAt || v.time) + "</div></div>" +
+              '<button class="btn sm" data-act="call" data-id="' + v.id + '">' + esc(T("q_call")) + "</button></div>";
+          }).join("") + "</div>" : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>" +
+        "</div>" +
+      "</div>" +
+    "</div>";
+}
+
+function stagePill(s) {
+  const cls = { registered: "grey", booked: "grey", checked_in: "amber", in_consult: "maroon",
+                ready_to_bill: "amber", paid: "ok", claimed: "teal" }[s] || "grey";
+  return '<span class="pill ' + cls + '">' + esc(T("st_" + s)) + "</span>";
+}
+
+/* ------------------------- patients ------------------------- */
+function viewPatients() {
+  const q = (VIEW.search || "").toLowerCase();
+  const list = DB.patients.filter(p => !q ||
+    (p.en + " " + (p.ar || "") + " " + p.mrn + " " + p.qid + " " + (p.phone || "")).toLowerCase().includes(q));
+  const rows = list.map(p => {
+    const i = p.insurance, ins = i ? insurer(i.insurerId) : null;
+    const pl = i ? planOf(i.insurerId, i.plan) : null;
+    const el = E.checkEligibility(i, pl, TODAY);
+    return '<tr class="click" data-act="open-pt" data-id="' + p.mrn + '"><td class="num">' + esc(p.mrn) + "</td><td>" +
+      esc(L(p)) + '<div class="mini num">' + esc(p.phone) + "</div></td>" +
+      '<td class="num">' + esc(p.qid) + "</td><td>" + esc(p.nationality) + "</td><td>" +
+      (ins ? esc(L(ins)) + '<div class="mini">' + esc(L(pl) || i.plan) + "</div>" : '<span class="pill grey">' + esc(T("noins")) + "</span>") + "</td>" +
+      "<td>" + (i ? (el.eligible ? '<span class="pill ok">' + esc(T("ins_eligible")) + "</span>"
+                                 : '<span class="pill bad">' + esc(T("ins_not")) + "</span>") : "—") + "</td></tr>";
+  }).join("");
+
+  return head("pt_t", "pt_s", '<button class="btn primary" data-act="new-pt">' + esc(T("pt_new")) + "</button>") +
+    '<div class="card"><header><input id="ptSearch" data-act="search" placeholder="' + esc(T("search")) +
+    ' — name, file number, QID, mobile" value="' + esc(VIEW.search) + '" style="max-width:360px"></header>' +
+    (rows ? "<table><thead><tr><th>" + esc(T("pt_mrn")) + "</th><th>" + esc(T("pt_name")) + "</th><th>" + esc(T("pt_qid")) +
+     "</th><th>" + esc(T("pt_nat")) + "</th><th>" + esc(T("ins_head")) + "</th><th>" + esc(T("status")) +
+     "</th></tr></thead><tbody>" + rows + "</tbody></table>" : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+}
+
+function viewPatient() {
+  const p = pt(VIEW.mrn); if (!p) return viewPatients();
+  const i = p.insurance, ins = i ? insurer(i.insurerId) : null, pl = i ? planOf(i.insurerId, i.plan) : null;
+  const el = E.checkEligibility(i, pl, TODAY);
+  const vis = DB.visits.filter(v => v.mrn === p.mrn).sort((a, b) => b.date.localeCompare(a.date));
+  const age = E.ageFrom(p.dob);
+
+  const insBox = !i ? '<div class="note warn">' + esc(T("ins_self")) + "</div>" :
+    '<div class="' + (el.eligible ? "note" : "note stop") + '">' +
+      "<b>" + esc(L(ins)) + " · " + esc(L(pl) || i.plan) + "</b> — " +
+      (el.eligible ? esc(T("ins_eligible")) : esc(T("ins_not")) + ": " + el.reasons.map(r => esc(reasonText(r))).join(", ")) +
+    "</div>" +
+    '<div class="grid g2" style="margin-top:12px">' +
+      minirow(T("ins_policy"), i.policyNo) + minirow(T("ins_card"), i.cardNo) +
+      minirow(T("ins_exp"), i.expiry) + minirow("TPA", ins.tpa) +
+      minirow(T("ins_copay"), qar(pl.copayConsult)) + minirow(T("ins_coins"), Math.round(pl.coinsurance * 100) + "%") +
+      minirow(T("ins_ded"), qar(Math.max(0, pl.deductible - (i.deductibleUsed || 0)))) +
+      minirow(T("ins_limit"), qar(Math.max(0, pl.annualLimit - (i.limitUsed || 0)))) +
+      minirow(T("ins_appr"), qar(pl.approvalThreshold)) +
+    "</div>";
+
+  const hist = vis.map(v => '<tr class="click" data-act="open-visit" data-id="' + v.id + '"><td class="num">' + esc(v.date) +
+    "</td><td>" + esc(L(doc(v.doctorId))) + "</td><td>" + (v.dx.length ? esc(v.dx.join(", ")) : '<span class="mini">—</span>') +
+    "</td><td>" + stagePill(v.stage) + '</td><td class="r money">' + (v.bill ? qar(v.bill.totals.gross) : "—") + "</td></tr>").join("");
+
+  return '<button class="btn ghost sm noprint" data-act="go" data-v="patients" style="margin-bottom:14px">← ' + esc(T("back")) + "</button>" +
+    '<div class="pagehead"><div><h1>' + esc(L(p)) + "</h1><p>" + esc(p.mrn) + " · " + esc(p.qid) + " · " +
+    (age != null ? age + (LANG === "ar" ? " سنة" : " yrs") : "") + " · " + esc(p.sex === "F" ? T("pt_female") : T("pt_male")) +
+    " · " + esc(p.phone) + '</p></div><div class="spacer"></div><div class="noprint">' +
+    '<button class="btn primary" data-act="book-for" data-id="' + p.mrn + '">' + esc(T("ap_book")) + "</button></div></div>" +
+    '<div class="grid g2">' +
+      '<div class="card"><header><h3>' + esc(T("ins_head")) + '</h3></header><div class="body">' + insBox + "</div></div>" +
+      '<div class="card"><header><h3>' + esc(LANG === "ar" ? "بيانات المريض" : "Patient file") + '</h3></header><div class="body">' +
+        minirow(T("pt_hc"), p.healthCard) + minirow(T("pt_dob"), p.dob) + minirow(T("pt_nat"), p.nationality) +
+        minirow(T("pt_addr"), p.address) + minirow(LANG === "ar" ? "تاريخ التسجيل" : "Registered", p.created) +
+      "</div></div>" +
+    "</div>" +
+    '<div class="card" style="margin-top:16px"><header><h3>' + esc(LANG === "ar" ? "سجل الزيارات" : "Visit history") + "</h3></header>" +
+    (hist ? "<table><thead><tr><th>" + esc(T("date")) + "</th><th>" + esc(T("dr_of")) + "</th><th>" + esc(T("c_dx")) +
+     "</th><th>" + esc(T("status")) + '</th><th class="r">' + esc(T("total")) + "</th></tr></thead><tbody>" + hist + "</tbody></table>"
+     : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+}
+
+function minirow(k, v) { return '<div class="rowline"><span class="mini">' + esc(k) + "</span><b>" + esc(v || "—") + "</b></div>"; }
+
+function reasonText(r) {
+  const m = { no_policy: LANG === "ar" ? "لا توجد وثيقة" : "no policy on file",
+              policy_inactive: LANG === "ar" ? "الوثيقة غير فعالة" : "policy inactive",
+              card_expired: LANG === "ar" ? "البطاقة منتهية" : "card expired",
+              limit_exhausted: LANG === "ar" ? "استُنفد الحد السنوي" : "annual limit exhausted" };
+  return m[r] || r;
+}
+
+/* ------------------------- appointments ------------------------- */
+function viewAppts() {
+  const d = VIEW.apptDoctor, date = VIEW.apptDate;
+  const taken = DB.visits.filter(v => v.doctorId === d && v.date === date).map(v => v.time);
+  const slots = SLOT_TIMES.map(t => taken.includes(t)
+    ? '<div class="slot taken num">' + t + "</div>"
+    : '<button class="slot num" data-act="pick-slot" data-t="' + t + '">' + t + "</button>").join("");
+
+  const today = DB.appointments.filter(a => a.date === date).sort((a, b) => a.time.localeCompare(b.time)).map(a => {
+    const v = visit(a.visitId), p = pt(a.mrn);
+    const canCheck = v && v.stage === "booked";
+    return '<tr><td class="num">' + esc(a.time) + '</td><td class="click" data-act="open-pt" data-id="' + p.mrn + '">' +
+      esc(L(p)) + '<div class="mini num">' + esc(p.mrn) + "</div></td><td>" + esc(L(doc(a.doctorId))) +
+      "</td><td>" + stagePill(v ? v.stage : "booked") + '</td><td class="r noprint">' +
+      (canCheck ? '<button class="btn sm" data-act="checkin" data-id="' + v.id + '">' + esc(T("ap_checkin")) + "</button>"
+                : '<button class="btn ghost sm" data-act="open-visit" data-id="' + (v ? v.id : "") + '">' + esc(T("visit")) + "</button>") +
+      "</td></tr>";
+  }).join("");
+
+  const docOpts = DB.departments.map(dp => {
+    const ds = DB.doctors.filter(x => x.dept === dp.id);
+    return ds.length ? '<optgroup label="' + esc(L(dp)) + '">' + ds.map(x =>
+      '<option value="' + x.id + '"' + (x.id === d ? " selected" : "") + ">" + esc(L(x)) + "</option>").join("") + "</optgroup>" : "";
+  }).join("");
+
+  return head("ap_t", "ap_s") +
+    '<div class="card" style="margin-bottom:16px"><div class="body"><div class="inline">' +
+      '<div><label>' + esc(T("ap_doctor")) + '</label><select data-act="set-doctor">' + docOpts + "</select></div>" +
+      '<div><label>' + esc(T("ap_date")) + '</label><input type="date" data-act="set-date" value="' + date + '"></div>' +
+      '<div style="flex:2"><label>' + esc(T("ap_slotfree")) + " — " + esc(L(doc(d))) + " · " + esc(L(dept(doc(d).dept))) +
+      ' · ' + esc(LANG === "ar" ? "غرفة" : "Room") + " " + esc(doc(d).room) + '</label><div class="slots">' + slots + "</div></div>" +
+    "</div></div></div>" +
+    '<div class="card"><header><h3>' + esc(T("ap_today")) + " — " + esc(date) + "</h3></header>" +
+    (today ? "<table><thead><tr><th>" + esc(T("time")) + "</th><th>" + esc(T("pt_of")) + "</th><th>" + esc(T("dr_of")) +
+     "</th><th>" + esc(T("status")) + '</th><th class="r noprint">' + esc(T("action")) + "</th></tr></thead><tbody>" + today + "</tbody></table>"
+     : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+}
+
+/* ------------------------- queue ------------------------- */
+function viewQueue() {
+  const wait = DB.visits.filter(v => v.stage === "checked_in");
+  const inc = DB.visits.filter(v => v.stage === "in_consult");
+  const card = (title, arr, act) => '<div class="card"><header><h3>' + esc(title) +
+    '</h3><span class="pill grey num">' + arr.length + "</span></header>" +
+    (arr.length ? "<table><tbody>" + arr.map((v, n) => {
+      const p = pt(v.mrn);
+      const elig = v.eligibility;
+      return "<tr><td style=\"width:34px\" class=\"num mini\">" + (n + 1) + "</td><td>" + esc(L(p)) +
+        '<div class="mini num">' + esc(v.mrn) + " · " + esc(v.checkedInAt || v.time) + "</div></td><td>" +
+        esc(L(doc(v.doctorId))) + '<div class="mini">' + esc(L(dept(v.deptId))) + "</div></td><td>" +
+        (elig && !elig.eligible ? '<span class="pill bad">' + esc(T("noins")) + "</span>" :
+         elig && elig.eligible ? '<span class="pill teal">' + esc(T("ins_eligible")) + "</span>" : "") +
+        '</td><td class="r noprint"><button class="btn sm" data-act="' + act + '" data-id="' + v.id + '">' +
+        esc(act === "call" ? T("q_call") : T("nav_consult")) + "</button></td></tr>";
+    }).join("") + "</tbody></table>" : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+
+  return head("q_t", "q_s") + '<div class="grid g2">' + card(T("q_waiting"), wait, "call") + card(T("q_inconsult"), inc, "open-visit") + "</div>";
+}
+
+/* ------------------------- consultation ------------------------- */
+function viewConsult() {
+  const open = DB.visits.filter(v => v.stage === "in_consult");
+  const v = VIEW.visitId ? visit(VIEW.visitId) : open[0];
+  if (!v) return head("c_t", "c_s") + '<div class="card"><div class="empty">' +
+    esc(LANG === "ar" ? "لا يوجد مريض في الكشف الآن." : "No patient is in consultation right now. Call one from the waiting room.") +
+    '<br><br><button class="btn" data-act="go" data-v="queue">' + esc(T("nav_queue")) + "</button></div></div>";
+
+  const p = pt(v.mrn), vt = v.vitals || {};
+  const preview = buildBill(v);
+  const dxOpts = DB.icd10.map(d => '<option value="' + d.code + '">' + esc(d.code + " — " + L(d)) + "</option>").join("");
+  const svcOpts = DB.departments.map(dp => {
+    const ss = DB.services.filter(s => s.dept === dp.id);
+    return ss.length ? '<optgroup label="' + esc(L(dp)) + '">' + ss.map(s =>
+      '<option value="' + s.code + '">' + esc(L(s)) + " — " + esc(qar(s.price)) + "</option>").join("") + "</optgroup>" : "";
+  }).join("");
+
+  const items = v.items.length ? "<table><thead><tr><th>" + esc(T("b_svc")) + '</th><th class="r">' + esc(T("m_price")) +
+    '</th><th class="r">' + esc(LANG === "ar" ? "عدد" : "Qty") + '</th><th class="r">' + esc(T("total")) + '</th><th class="noprint"></th></tr></thead><tbody>' +
+    v.items.map(i => "<tr><td>" + esc(L({ en: i.name, ar: i.nameAr })) + '<div class="mini num">' + esc(i.code) + "</div></td>" +
+      '<td class="r num">' + esc(qar(i.price)) + '</td><td class="r num">' + i.qty + '</td><td class="r money">' + esc(qar(i.price * i.qty)) +
+      '</td><td class="r noprint"><button class="btn ghost sm" data-act="rm-item" data-code="' + i.code + '">✕</button></td></tr>').join("") +
+    "</tbody></table>" : '<div class="empty">' + esc(LANG === "ar" ? "لم تُطلب خدمات بعد." : "No services ordered yet.") + "</div>";
+
+  return ribbon(v.stage) +
+    '<div class="pagehead"><div><h1>' + esc(L(p)) + "</h1><p>" + esc(v.mrn) + " · " + esc(L(doc(v.doctorId))) + " · " +
+    esc(L(dept(v.deptId))) + " · " + esc(v.id) + '</p></div><div class="spacer"></div><div class="noprint">' +
+    '<button class="btn primary" data-act="to-cashier" data-id="' + v.id + '"' + (v.items.length ? "" : " disabled") + ">" +
+    esc(T("c_finish")) + "</button></div></div>" +
+    '<div class="grid g2">' +
+      '<div class="card"><header><h3>' + esc(T("c_vitals")) + '</h3></header><div class="body">' +
+        '<div class="inline">' +
+          fld(T("c_bp"), '<input data-vital="bp" value="' + esc(vt.bp || "") + '" placeholder="120/80">') +
+          fld(T("c_pulse"), '<input data-vital="pulse" value="' + esc(vt.pulse || "") + '" placeholder="76">') +
+          fld(T("c_temp"), '<input data-vital="temp" value="' + esc(vt.temp || "") + '" placeholder="36.8">') +
+        "</div><div class=\"inline\">" +
+          fld(T("c_wt"), '<input data-vital="wt" value="' + esc(vt.wt || "") + '" placeholder="72">') +
+          fld(T("c_ht"), '<input data-vital="ht" value="' + esc(vt.ht || "") + '" placeholder="168">') +
+        "</div>" +
+        '<div class="field"><label>' + esc(T("c_complaint")) + '</label><input data-fld="complaint" value="' + esc(v.complaint || "") + '"></div>' +
+        '<div class="field"><label>' + esc(T("c_notes")) + '</label><textarea rows="3" data-fld="notes">' + esc(v.notes || "") + "</textarea></div>" +
+        '<div class="field"><label>' + esc(T("c_dx")) + '</label><select data-act="add-dx"><option value="">— ' + esc(T("add")) + " —</option>" + dxOpts + "</select>" +
+        '<div style="margin-top:8px">' + (v.dx.length ? v.dx.map(c => {
+          const d = DB.icd10.find(x => x.code === c) || { code: c };
+          return '<span class="pill maroon" style="margin-inline-end:6px;cursor:pointer" data-act="rm-dx" data-code="' + c + '">' +
+                 esc(d.code + " — " + L(d)) + " ✕</span>";
+        }).join("") : '<span class="mini">' + esc(T("none")) + "</span>") + "</div></div>" +
+      "</div></div>" +
+      '<div><div class="card"><header><h3>' + esc(T("c_orders")) + "</h3></header>" +
+        '<div class="body noprint"><label>' + esc(T("c_addsvc")) + '</label><select data-act="add-svc"><option value="">— ' +
+        esc(T("add")) + " —</option>" + svcOpts + "</select></div>" + items + "</div>" +
+        '<div class="card" style="margin-top:16px"><header><h3>' + esc(LANG === "ar" ? "تقدير الفاتورة" : "Bill preview") +
+        "</h3></header><div class=\"body\">" + splitSummary(preview) + "</div></div>" +
+      "</div>" +
+    "</div>";
+}
+
+function fld(lab, inner) { return '<div class="field"><label>' + esc(lab) + "</label>" + inner + "</div>"; }
+
+function splitSummary(b) {
+  const g = b.totals.gross || 1;
+  return '<div class="splitbar"><i class="ins" style="width:' + (b.totals.insurance / g * 100) + '%"></i>' +
+    '<i class="pat" style="width:' + (b.totals.patient / g * 100) + '%"></i></div>' +
+    '<div class="legend"><span><b style="background:var(--teal)"></b>' + esc(T("b_ins")) + "</span>" +
+    '<span><b style="background:var(--amber)"></b>' + esc(T("b_pat")) + "</span></div>" +
+    '<div style="margin-top:12px">' +
+      '<div class="tot"><span>' + esc(T("b_gross")) + '</span><span class="money num">' + qar(b.totals.gross) + "</span></div>" +
+      '<div class="tot"><span>' + esc(T("b_ins")) + '</span><span class="money ins num">' + qar(b.totals.insurance) + "</span></div>" +
+      '<div class="tot big"><span>' + esc(T("b_pat")) + '</span><span class="money pat num">' + qar(b.totals.patient) + "</span></div>" +
+    "</div>" +
+    (b.pendingApprovals.length ? '<div class="note warn" style="margin-top:12px">' + esc(T("needappr")) + ": " +
+      b.pendingApprovals.map(x => esc(x.code) + " (" + esc(qar(x.amount)) + ")").join(", ") + "</div>" : "");
+}
+
+/* ------------------------- cashier ------------------------- */
+function viewBilling() {
+  const ready = DB.visits.filter(v => v.stage === "ready_to_bill");
+  const v = VIEW.visitId ? visit(VIEW.visitId) : ready[0];
+  if (!v || v.stage !== "ready_to_bill") {
+    const rows = ready.map(x => '<tr class="click" data-act="open-visit" data-id="' + x.id + '"><td>' + esc(L(pt(x.mrn))) +
+      '<div class="mini num">' + esc(x.mrn) + "</div></td><td>" + esc(L(doc(x.doctorId))) + '</td><td class="r money">' +
+      qar(x.bill.totals.gross) + '</td><td class="r money pat">' + qar(x.bill.totals.patient) + "</td></tr>").join("");
+    return head("b_t", "b_s") + '<div class="card"><header><h3>' + esc(T("b_ready")) + "</h3></header>" +
+      (rows ? "<table><thead><tr><th>" + esc(T("pt_of")) + "</th><th>" + esc(T("dr_of")) + '</th><th class="r">' +
+       esc(T("b_gross")) + '</th><th class="r">' + esc(T("b_pat")) + "</th></tr></thead><tbody>" + rows + "</tbody></table>"
+       : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+  }
+
+  const p = pt(v.mrn); v.bill = buildBill(v); const b = v.bill;
+  const rmap = { self_pay: T("noins"), excluded: T("excluded"), awaiting_approval: T("needappr"),
+                 copay: T("copay"), coinsurance: T("coins"), deductible: T("dedapp"), over_limit: T("overlimit") };
+
+  const lines = b.lines.map(l => {
+    const it = v.items.find(i => i.code === l.code);
+    const needs = l.reason === "awaiting_approval";
+    return "<tr><td>" + esc(l.name) + '<div class="mini num">' + esc(l.code) + " × " + l.qty + "</div></td>" +
+      '<td><span class="pill ' + (needs ? "bad" : l.reason === "excluded" ? "amber" : "grey") + '">' + esc(rmap[l.reason] || l.reason) + "</span>" +
+      (needs ? ' <button class="btn sm noprint" data-act="approve" data-code="' + l.code + '">' + esc(T("approve")) + "</button>" : "") + "</td>" +
+      '<td class="r num">' + qar(l.gross) + '</td><td class="r money ins num">' + qar(l.insurance) +
+      '</td><td class="r money pat num">' + qar(l.patient) + "</td></tr>";
+  }).join("");
+
+  return ribbon(v.stage) +
+    '<div class="pagehead"><div><h1>' + esc(T("b_t")) + " — " + esc(L(p)) + "</h1><p>" + esc(v.id) + " · " + esc(v.mrn) + " · " +
+    esc(L(doc(v.doctorId))) + " · " + (p.insurance ? esc(L(insurer(p.insurance.insurerId))) + " " + esc(p.insurance.plan) : esc(T("noins"))) +
+    '</p></div><div class="spacer"></div><div class="noprint"><button class="btn ghost" data-act="go" data-v="billing" data-clear="1">' +
+    esc(T("b_ready")) + "</button></div></div>" +
+    '<div class="grid g2">' +
+      '<div class="card"><header><h3>' + esc(LANG === "ar" ? "تفاصيل الفاتورة" : "Bill lines") + "</h3></header>" +
+        "<table><thead><tr><th>" + esc(T("b_svc")) + "</th><th>" + esc(T("b_reason")) + '</th><th class="r">' + esc(T("b_gross")) +
+        '</th><th class="r">' + esc(T("b_ins")) + '</th><th class="r">' + esc(T("b_pat")) + "</th></tr></thead><tbody>" + lines +
+        '</tbody><tfoot><tr><th colspan="2">' + esc(T("total")) + '</th><th class="r num">' + qar(b.totals.gross) +
+        '</th><th class="r num ins money">' + qar(b.totals.insurance) + '</th><th class="r num pat money">' + qar(b.totals.patient) +
+        "</th></tr></tfoot></table></div>" +
+      '<div><div class="card"><header><h3>' + esc(LANG === "ar" ? "الملخص" : "Summary") + '</h3></header><div class="body">' +
+        splitSummary(b) +
+        (b.deductibleApplied > 0 ? '<div class="note" style="margin-top:12px">' + esc(T("dedapp")) + ": " + esc(qar(b.deductibleApplied)) + "</div>" : "") +
+      "</div></div>" +
+      '<div class="card noprint" style="margin-top:16px"><header><h3>' + esc(T("b_collect")) + '</h3></header><div class="body">' +
+        '<div class="field"><label>' + esc(T("b_method")) + '</label><select id="payMethod"><option value="cash">' + esc(T("b_cash")) +
+        '</option><option value="card">' + esc(T("b_card")) + '</option><option value="naps">' + esc(T("b_naps")) +
+        '</option><option value="transfer">' + esc(T("b_transfer")) + "</option></select></div>" +
+        '<div class="field"><label>' + esc(T("b_tendered")) + '</label><input id="payTendered" type="number" step="0.01" value="' +
+        b.totals.patient.toFixed(2) + '"></div>' +
+        '<button class="btn primary" data-act="collect" data-id="' + v.id + '" style="width:100%">' +
+        esc(T("b_collect")) + " — " + esc(qar(b.totals.patient)) + "</button>" +
+        (b.pendingApprovals.length ? '<div class="note warn" style="margin-top:12px">' +
+          esc(LANG === "ar" ? "بنود بانتظار الموافقة ستُحمَّل على المريض بالكامل." : "Items still awaiting approval are charged to the patient in full.") + "</div>" : "") +
+      "</div></div></div>" +
+    "</div>";
+}
+
+function receipt(v) {
+  const p = pt(v.mrn), b = v.bill, pay = v.payments[v.payments.length - 1] || {};
+  return '<div style="font-size:13px">' +
+    '<div style="text-align:center;margin-bottom:14px"><b style="font-size:16px">' + esc(L(DB.centre)) + "</b><br>" +
+      '<span class="mini">' + esc(L(DB.centre.addr)) + "<br>" + esc(DB.centre.phone) + " · " + esc(DB.centre.licence) + "</span></div>" +
+    minirow(T("b_receipt"), pay.ref || "—") + minirow(T("date"), TODAY) + minirow(T("pt_of"), L(p) + " (" + v.mrn + ")") +
+    minirow(T("dr_of"), L(doc(v.doctorId))) +
+    '<table style="margin:12px 0"><tbody>' + b.lines.map(l => "<tr><td>" + esc(l.name) + '</td><td class="r num">' +
+      qar(l.gross) + '</td><td class="r num pat money">' + qar(l.patient) + "</td></tr>").join("") + "</tbody></table>" +
+    '<div class="tot"><span>' + esc(T("b_gross")) + "</span><span class=\"num\">" + qar(b.totals.gross) + "</span></div>" +
+    '<div class="tot"><span>' + esc(T("b_ins")) + '</span><span class="num ins money">' + qar(b.totals.insurance) + "</span></div>" +
+    '<div class="tot big"><span>' + esc(T("b_pat")) + '</span><span class="num pat money">' + qar(pay.amount || b.totals.patient) + "</span></div>" +
+    '<div class="mini" style="margin-top:8px">' + esc(T("b_method")) + ": " + esc(T("b_" + (pay.method || "cash"))) + "</div>" +
+    '<div class="mini" style="margin-top:10px">' + esc(LANG === "ar" ? "لا تُطبَّق ضريبة القيمة المضافة في دولة قطر." : "VAT is not applicable in the State of Qatar.") + "</div></div>";
+}
+
+/* ------------------------- claims ------------------------- */
+function viewClaims() {
+  const rows = DB.claims.slice().reverse().map(c => {
+    const ins = insurer(c.insurerId), p = pt(c.mrn);
+    const age = c.submitted ? E.daysBetween(c.submitted, TODAY) : 0;
+    const cls = { draft: "grey", submitted: "amber", paid: "ok", part: "teal", rejected: "bad" }[c.status];
+    return "<tr><td class=\"num\">" + esc(c.id) + '<div class="mini">' + esc(c.created) + "</div></td><td>" + esc(L(p)) +
+      '<div class="mini num">' + esc(c.mrn) + "</div></td><td>" + esc(L(ins)) + '<div class="mini">' + esc(ins.tpa) + " · " + esc(c.plan) +
+      "</div></td><td>" + esc(c.dx.join(", ") || "—") + '</td><td class="r money num">' + qar(c.amount) +
+      '</td><td class="r num">' + (c.settled ? qar(c.settled) : "—") + '</td><td><span class="pill ' + cls + '">' + esc(T("cl_" + c.status)) + "</span>" +
+      (c.rejectReason ? '<div class="mini">' + esc(c.rejectReason) + "</div>" : "") + '</td><td class="r num">' +
+      (c.submitted ? age + "d" : "—") + '</td><td class="r noprint">' +
+      (c.status === "draft" ? '<button class="btn sm" data-act="submit-claim" data-id="' + c.id + '">' + esc(T("cl_submit")) + "</button>" :
+       c.status === "submitted" ? '<button class="btn ghost sm" data-act="settle-claim" data-id="' + c.id + '">' + esc(T("cl_settle")) + "</button>" : "") +
+      "</td></tr>";
+  }).join("");
+
+  const byStatus = ["draft", "submitted", "part", "paid", "rejected"].map(s => {
+    const cs = DB.claims.filter(c => c.status === s);
+    return '<div class="kpi"><div class="lab">' + esc(T("cl_" + s)) + '</div><div class="val num">' + cs.length +
+      '</div><div class="foot num">' + qar(sum(cs, c => c.amount)) + "</div></div>";
+  }).join("");
+
+  return head("cl_t", "cl_s") + '<div class="grid g4" style="margin-bottom:16px">' + byStatus + "</div>" +
+    '<div class="card">' + (rows ? "<table><thead><tr><th>" + esc(T("visit")) + "</th><th>" + esc(T("pt_of")) + "</th><th>" +
+    esc(T("ins_company")) + "</th><th>ICD-10</th><th class=\"r\">" + esc(T("cl_amount")) + '</th><th class="r">' + esc(T("cl_settled")) +
+    "</th><th>" + esc(T("cl_status")) + '</th><th class="r">' + esc(T("cl_age")) + '</th><th class="r noprint">' + esc(T("action")) +
+    "</th></tr></thead><tbody>" + rows + "</tbody></table>" : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+}
+
+/* ------------------------- finance ------------------------- */
+function viewFinance() {
+  const from = VIEW.finFrom, to = VIEW.finTo;
+  const inRange = d => d >= from && d <= to;
+  const pays = DB.payments.filter(p => inRange(p.date));
+  const visits = DB.visits.filter(v => v.billedAt && inRange(v.billedAt) && v.bill);
+  const gross = sum(visits, v => v.bill.totals.gross);
+  const insShare = sum(visits, v => v.bill.totals.insurance);
+  const collected = sum(pays, p => p.amount);
+
+  const byMethod = ["cash", "card", "naps", "transfer"].map(m => {
+    const a = sum(pays.filter(p => p.method === m), p => p.amount);
+    return { m, a, n: pays.filter(p => p.method === m).length };
+  });
+  const maxM = Math.max(1, ...byMethod.map(x => x.a));
+
+  const byDept = DB.departments.map(d => {
+    const vs = visits.filter(v => v.deptId === d.id);
+    const amt = sum(vs, v => sum(v.bill.lines.filter(l => (svc(l.code) || {}).dept === d.id || v.deptId === d.id), l => l.gross));
+    return { d, amt, n: vs.length };
+  }).filter(x => x.amt > 0).sort((a, b) => b.amt - a.amt);
+  const maxD = Math.max(1, ...byDept.map(x => x.amt));
+
+  const byDoc = DB.doctors.map(dc => {
+    const vs = visits.filter(v => v.doctorId === dc.id);
+    return { dc, amt: sum(vs, v => v.bill.totals.gross), n: vs.length };
+  }).filter(x => x.amt > 0).sort((a, b) => b.amt - a.amt);
+
+  const openClaims = DB.claims.filter(c => c.status === "submitted" || c.status === "draft" || c.status === "part");
+  const buckets = { "0-30": 0, "31-60": 0, "61-90": 0, "90+": 0 };
+  openClaims.forEach(c => {
+    const d = E.daysBetween(c.submitted || c.created, TODAY);
+    buckets[E.agingBucket(d)] += (c.amount - (c.settled || 0));
+  });
+  const totalRecv = sum(Object.keys(buckets), k => buckets[k]);
+
+  const jrows = DB.journal.filter(j => inRange(j.date)).slice().reverse().slice(0, 40).map(j =>
+    j.lines.map((l, n) => "<tr>" + (n === 0 ? '<td rowspan="' + j.lines.length + '" class="num">' + esc(j.date) +
+      '<div class="mini">' + esc(j.id) + "</div></td><td rowspan=\"" + j.lines.length + '"><div class="mini">' + esc(j.memo) +
+      "</div>" + esc(j.ref) + "</td>" : "") +
+      '<td><span class="num mini">' + esc(l.acc.code) + "</span> " + esc(L(l.acc)) + '</td><td class="r num">' +
+      (l.dr ? qar(l.dr) : "") + '</td><td class="r num">' + (l.cr ? qar(l.cr) : "") + "</td></tr>").join("")).join("");
+
+  const bar = (label, val, max, cls, note) =>
+    '<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:13px">' +
+    "<span>" + esc(label) + '</span><span class="num money">' + qar(val) + "</span></div>" +
+    '<div style="height:7px;background:var(--line-2);border-radius:4px;overflow:hidden;margin-top:4px">' +
+    '<i style="display:block;height:100%;width:' + Math.max(2, val / max * 100) + "%;background:var(--" + cls + ')"></i></div>' +
+    (note ? '<div class="mini">' + esc(note) + "</div>" : "") + "</div>";
+
+  return head("f_t", "f_s") +
+    '<div class="card noprint" style="margin-bottom:16px"><div class="body"><div class="inline">' +
+      '<div><label>' + esc(LANG === "ar" ? "من" : "From") + '</label><input type="date" data-act="fin-from" value="' + from + '"></div>' +
+      '<div><label>' + esc(LANG === "ar" ? "إلى" : "To") + '</label><input type="date" data-act="fin-to" value="' + to + '"></div>' +
+      '<div style="flex:3"></div><div><button class="btn ghost" data-act="print">' + esc(T("print")) + "</button></div>" +
+    "</div></div></div>" +
+    '<div class="grid g4" style="margin-bottom:16px">' +
+      '<div class="kpi"><div class="lab">' + esc(LANG === "ar" ? "إجمالي الإيراد" : "Gross revenue") + '</div><div class="val num">' + qar(gross) +
+        '</div><div class="foot num">' + visits.length + (LANG === "ar" ? " زيارة مفوترة" : " billed visits") + "</div></div>" +
+      '<div class="kpi teal"><div class="lab">' + esc(LANG === "ar" ? "محصّل نقداً/بطاقة" : "Collected from patients") + '</div><div class="val num">' + qar(collected) +
+        '</div><div class="foot num">' + pays.length + (LANG === "ar" ? " إيصال" : " receipts") + "</div></div>" +
+      '<div class="kpi amber"><div class="lab">' + esc(LANG === "ar" ? "محمّل على التأمين" : "Billed to insurers") + '</div><div class="val num">' + qar(insShare) +
+        '</div><div class="foot">' + esc(Math.round(gross ? insShare / gross * 100 : 0) + "% " + (LANG === "ar" ? "من الإيراد" : "of revenue")) + "</div></div>" +
+      '<div class="kpi maroon"><div class="lab">' + esc(T("k_recv")) + '</div><div class="val num">' + qar(totalRecv) +
+        '</div><div class="foot num">' + openClaims.length + (LANG === "ar" ? " مطالبة مفتوحة" : " open claims") + "</div></div>" +
+    "</div>" +
+    '<div class="grid g3">' +
+      '<div class="card"><header><h3>' + esc(T("f_collect")) + '</h3></header><div class="body">' +
+        byMethod.map(x => bar(T("b_" + x.m), x.a, maxM, "teal", x.n + (LANG === "ar" ? " عملية" : " transactions"))).join("") + "</div></div>" +
+      '<div class="card"><header><h3>' + esc(T("f_revdept")) + '</h3></header><div class="body">' +
+        (byDept.length ? byDept.map(x => bar(L(x.d), x.amt, maxD, "maroon", x.n + (LANG === "ar" ? " زيارة" : " visits"))).join("")
+         : '<div class="mini">' + esc(T("none")) + "</div>") + "</div></div>" +
+      '<div class="card"><header><h3>' + esc(T("f_aging")) + '</h3></header><div class="body">' +
+        Object.keys(buckets).map(k => bar(k + (LANG === "ar" ? " يوم" : " days"), buckets[k], Math.max(1, ...Object.values(buckets)), "amber")).join("") +
+      "</div></div>" +
+    "</div>" +
+    '<div class="grid g2" style="margin-top:16px">' +
+      '<div class="card"><header><h3>' + esc(T("f_revdoc")) + "</h3></header>" +
+        (byDoc.length ? "<table><thead><tr><th>" + esc(T("dr_of")) + "</th><th>" + esc(T("ap_dept")) + '</th><th class="r">' +
+         esc(LANG === "ar" ? "زيارات" : "Visits") + '</th><th class="r">' + esc(T("amount")) + "</th></tr></thead><tbody>" +
+         byDoc.map(x => "<tr><td>" + esc(L(x.dc)) + "</td><td>" + esc(L(dept(x.dc.dept))) + '</td><td class="r num">' + x.n +
+         '</td><td class="r money num">' + qar(x.amt) + "</td></tr>").join("") + "</tbody></table>"
+         : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>" +
+      '<div class="card"><header><h3>' + esc(T("f_journal")) + '</h3><span class="mini">' +
+        esc(LANG === "ar" ? "قيود مزدوجة" : "double entry") + "</span></header>" +
+        (jrows ? "<table><thead><tr><th>" + esc(T("date")) + "</th><th>" + esc(T("f_ref")) + "</th><th>" + esc(T("f_account")) +
+         '</th><th class="r">' + esc(T("f_dr")) + '</th><th class="r">' + esc(T("f_cr")) + "</th></tr></thead><tbody>" + jrows + "</tbody></table>"
+         : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>" +
+    "</div>";
+}
+
+/* ------------------------- master data ------------------------- */
+function viewMasters() {
+  const s = DB.services.map(x => "<tr><td class=\"num\">" + esc(x.code) + "</td><td>" + esc(L(x)) + "</td><td>" + esc(L(dept(x.dept))) +
+    '</td><td><span class="pill grey">' + esc(x.type) + '</span></td><td class="r money num">' + qar(x.price) + "</td></tr>").join("");
+  const d = DB.doctors.map(x => "<tr><td>" + esc(L(x)) + "</td><td>" + esc(L(dept(x.dept))) + '</td><td class="num">' + esc(x.dhp) +
+    '</td><td class="num">' + esc(x.room) + '</td><td class="r money num">' + qar(x.fee) + "</td></tr>").join("");
+  const i = DB.insurers.map(x => x.plans.map((p, n) => "<tr>" + (n === 0 ? '<td rowspan="' + x.plans.length + '">' + esc(L(x)) +
+    '<div class="mini">' + esc(x.tpa) + "</div></td>" : "") + "<td>" + esc(L(p)) + '</td><td class="r num">' + Math.round(p.coinsurance * 100) +
+    '%</td><td class="r num">' + qar(p.copayConsult) + '</td><td class="r num">' + qar(p.deductible) + '</td><td class="r num">' +
+    qar(p.annualLimit) + '</td><td class="r num">' + qar(p.approvalThreshold) + "</td><td>" +
+    (p.exclusions.length ? p.exclusions.map(e => '<span class="pill amber">' + esc(e) + "</span>").join(" ") : '<span class="mini">—</span>') +
+    "</td></tr>").join("")).join("");
+
+  return head("m_t", "m_s") +
+    '<div class="card" style="margin-bottom:16px"><header><h3>' + esc(T("m_insurers")) + "</h3></header>" +
+    "<table><thead><tr><th>" + esc(T("ins_company")) + "</th><th>" + esc(T("ins_plan")) + '</th><th class="r">' + esc(T("ins_coins")) +
+    '</th><th class="r">' + esc(T("ins_copay")) + '</th><th class="r">' + esc(LANG === "ar" ? "التحمل" : "Deductible") +
+    '</th><th class="r">' + esc(LANG === "ar" ? "الحد السنوي" : "Annual limit") + '</th><th class="r">' + esc(T("ins_appr")) +
+    "</th><th>" + esc(LANG === "ar" ? "استثناءات" : "Exclusions") + "</th></tr></thead><tbody>" + i + "</tbody></table></div>" +
+    '<div class="grid g2">' +
+      '<div class="card"><header><h3>' + esc(T("m_services")) + '</h3><span class="mini num">' + DB.services.length + "</span></header>" +
+      "<table><thead><tr><th>" + esc(T("m_code")) + "</th><th>" + esc(T("b_svc")) + "</th><th>" + esc(T("ap_dept")) + "</th><th>" +
+      esc(T("m_type")) + '</th><th class="r">' + esc(T("m_price")) + "</th></tr></thead><tbody>" + s + "</tbody></table></div>" +
+      '<div class="card"><header><h3>' + esc(T("m_doctors")) + '</h3><span class="mini num">' + DB.doctors.length + "</span></header>" +
+      "<table><thead><tr><th>" + esc(T("dr_of")) + "</th><th>" + esc(T("ap_dept")) + "</th><th>" + esc(T("m_dhp")) + "</th><th>" +
+      esc(LANG === "ar" ? "غرفة" : "Room") + '</th><th class="r">' + esc(T("m_fee")) + "</th></tr></thead><tbody>" + d + "</tbody></table></div>" +
+    "</div>";
+}
+
+/* ------------------------- modals ------------------------- */
+function modal(title, bodyHtml, footHtml) {
+  $("#modalHost").innerHTML = '<div class="backdrop" data-act="close-modal"><div class="modal" onclick="event.stopPropagation()">' +
+    "<header><h2>" + esc(title) + '</h2><button class="x" data-act="close-modal">×</button></header>' +
+    '<div class="body">' + bodyHtml + "</div>" +
+    (footHtml ? "<footer>" + footHtml + "</footer>" : "") + "</div></div>";
+}
+function closeModal() { $("#modalHost").innerHTML = ""; }
+
+function newPatientModal() {
+  const insOpts = DB.insurers.map(i => '<option value="' + i.id + '">' + esc(L(i)) + " — " + esc(i.tpa) + "</option>").join("");
+  modal(T("pt_new"),
+    '<div class="inline">' + fld(T("pt_name"), '<input id="f_en" placeholder="Full name as on QID">') +
+      fld(T("pt_name_ar"), '<input id="f_ar" dir="rtl" placeholder="الاسم بالعربية">') + "</div>" +
+    '<div class="inline">' + fld(T("pt_qid"), '<input id="f_qid" inputmode="numeric" maxlength="11" placeholder="28634500912"><div class="hint" id="qidHint">11 digits, starts with 2 or 3</div>') +
+      fld(T("pt_hc"), '<input id="f_hc" placeholder="HC-0000000">') + "</div>" +
+    '<div class="inline">' + fld(T("pt_dob"), '<input id="f_dob" type="date">') +
+      fld(T("pt_sex"), '<select id="f_sex"><option value="M">' + esc(T("pt_male")) + '</option><option value="F">' + esc(T("pt_female")) + "</option></select>") +
+      fld(T("pt_nat"), '<input id="f_nat" placeholder="Qatari">') + "</div>" +
+    '<div class="inline">' + fld(T("pt_phone"), '<input id="f_phone" inputmode="numeric" placeholder="33xxxxxx"><div class="hint">8 digits, starts 3/5/6/7</div>') +
+      fld(T("pt_email"), '<input id="f_email" type="email">') + "</div>" +
+    fld(T("pt_addr"), '<input id="f_addr" placeholder="Al Sadd, Zone 38, Street 850">') +
+    '<h3 style="margin:18px 0 10px">' + esc(T("ins_head")) + "</h3>" +
+    fld(T("ins_company"), '<select id="f_ins"><option value="">' + esc(T("ins_self")) + "</option>" + insOpts + "</select>") +
+    '<div id="insFields" style="display:none">' +
+      '<div class="inline">' + fld(T("ins_plan"), '<select id="f_plan"></select>') +
+        fld(T("ins_policy"), '<input id="f_pol">') + "</div>" +
+      '<div class="inline">' + fld(T("ins_card"), '<input id="f_card">') +
+        fld(T("ins_exp"), '<input id="f_exp" type="date">') + "</div>" +
+    "</div>" +
+    '<div id="regErr"></div>',
+    '<button class="btn ghost" data-act="close-modal">' + esc(T("cancel")) + "</button>" +
+    '<button class="btn primary" data-act="save-pt">' + esc(T("save")) + "</button>");
+
+  $("#f_ins").addEventListener("change", e => {
+    const i = insurer(e.target.value);
+    $("#insFields").style.display = i ? "block" : "none";
+    if (i) $("#f_plan").innerHTML = i.plans.map(p => '<option value="' + p.code + '">' + esc(L(p)) + "</option>").join("");
+  });
+}
+
+function savePatient() {
+  const val = id => ($("#" + id) ? $("#" + id).value.trim() : "");
+  const errs = [];
+  if (!val("f_en")) errs.push(LANG === "ar" ? "الاسم مطلوب" : "Name is required");
+  const q = E.validateQID(val("f_qid")); if (!q.ok) errs.push(q.reason);
+  const ph = E.validateQatarPhone(val("f_phone")); if (!ph.ok) errs.push(ph.reason);
+  if (!val("f_dob")) errs.push(LANG === "ar" ? "تاريخ الميلاد مطلوب" : "Date of birth is required");
+  const insId = val("f_ins");
+  if (insId && !val("f_exp")) errs.push(LANG === "ar" ? "تاريخ انتهاء البطاقة مطلوب" : "Card expiry is required");
+  if (errs.length) { $("#regErr").innerHTML = '<div class="note stop">' + errs.map(esc).join("<br>") + "</div>"; return; }
+
+  const p = registerPatient({
+    en: val("f_en"), ar: val("f_ar"), qid: val("f_qid"), healthCard: val("f_hc"), dob: val("f_dob"),
+    sex: val("f_sex"), nationality: val("f_nat") || "—", phone: ph.normalised, email: val("f_email"),
+    address: val("f_addr"),
+    insurance: insId ? { insurerId: insId, plan: val("f_plan"), policyNo: val("f_pol"), cardNo: val("f_card"),
+                         expiry: val("f_exp"), active: true, deductibleUsed: 0, limitUsed: 0 } : null
+  });
+  closeModal();
+  toast((LANG === "ar" ? "تم التسجيل — " : "Registered — ") + p.mrn);
+  go("patient", { mrn: p.mrn });
+}
+
+function pickPatientModal(time) {
+  const opts = DB.patients.map(p => '<option value="' + p.mrn + '">' + esc(L(p)) + " — " + esc(p.mrn) + "</option>").join("");
+  modal(T("ap_book") + " · " + time,
+    fld(T("pt_of"), '<select id="bkMrn">' + opts + "</select>") +
+    '<div class="note">' + esc(L(doc(VIEW.apptDoctor))) + " · " + esc(L(dept(doc(VIEW.apptDoctor).dept))) + " · " +
+    esc(VIEW.apptDate) + " " + esc(time) + "</div>",
+    '<button class="btn ghost" data-act="close-modal">' + esc(T("cancel")) + "</button>" +
+    '<button class="btn primary" data-act="do-book" data-t="' + time + '">' + esc(T("confirm")) + "</button>");
+}
+
+function settleModal(c) {
+  modal(T("cl_settle") + " · " + c.id,
+    minirow(T("cl_amount"), qar(c.amount)) + minirow(T("ins_company"), L(insurer(c.insurerId))) +
+    fld(T("cl_settled"), '<input id="stAmt" type="number" step="0.01" value="' + c.amount.toFixed(2) + '">') +
+    fld(LANG === "ar" ? "سبب الخصم أو الرفض" : "Reason for any shortfall",
+        '<input id="stWhy" placeholder="' + esc(LANG === "ar" ? "اختياري" : "Optional — e.g. service outside plan schedule") + '">'),
+    '<button class="btn ghost" data-act="close-modal">' + esc(T("cancel")) + "</button>" +
+    '<button class="btn primary" data-act="do-settle" data-id="' + c.id + '">' + esc(T("save")) + "</button>");
+}
+
+/* ------------------------- events ------------------------- */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]"); if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+
+  switch (act) {
+    case "go": go(el.dataset.v, el.dataset.clear ? { visitId: null, mrn: null } : {}); break;
+    case "close-modal": if (e.target === el) closeModal(); break;
+    case "new-pt": newPatientModal(); break;
+    case "save-pt": savePatient(); break;
+    case "open-pt": go("patient", { mrn: id }); break;
+    case "book-for": go("appts", { mrn: id }); toast(LANG === "ar" ? "اختر وقتاً متاحاً" : "Pick a free slot"); break;
+    case "pick-slot": {
+      if (VIEW.mrn) { const v = bookAppointment(VIEW.mrn, VIEW.apptDoctor, VIEW.apptDate, el.dataset.t);
+        VIEW.mrn = null; toast(T("ap_book") + " ✓ " + v.id); render(); }
+      else pickPatientModal(el.dataset.t);
+      break;
+    }
+    case "do-book": {
+      const mrn = $("#bkMrn").value;
+      const v = bookAppointment(mrn, VIEW.apptDoctor, VIEW.apptDate, el.dataset.t);
+      closeModal(); toast(T("ap_book") + " ✓ " + v.id); render(); break;
+    }
+    case "checkin": { const v = visit(id); checkIn(v);
+      toast(v.eligibility && v.eligibility.eligible ? T("ap_checkin") + " ✓ " + T("ins_eligible")
+            : T("ap_checkin") + " ✓ " + T("noins"), v.eligibility && !v.eligibility.eligible);
+      render(); break; }
+    case "call": callPatient(visit(id)); go("consult", { visitId: id }); break;
+    case "open-visit": {
+      const v = visit(id); if (!v) break;
+      if (v.stage === "in_consult") go("consult", { visitId: id });
+      else if (v.stage === "ready_to_bill") go("billing", { visitId: id });
+      else go("patient", { mrn: v.mrn });
+      break;
+    }
+    case "add-dx": break;
+    case "rm-dx": { const v = visit(VIEW.visitId); v.dx = v.dx.filter(x => x !== el.dataset.code); render(); break; }
+    case "rm-item": { const v = visit(VIEW.visitId); v.items = v.items.filter(i => i.code !== el.dataset.code); render(); break; }
+    case "to-cashier": { const v = visit(id); captureConsult(v); sendToCashier(v);
+      toast(T("c_finish") + " ✓"); go("billing", { visitId: id }); break; }
+    case "approve": { const v = visit(VIEW.visitId) || DB.visits.find(x => x.stage === "ready_to_bill");
+      const it = v.items.find(i => i.code === el.dataset.code); if (it) it.approved = true;
+      toast(T("approved") + " — " + el.dataset.code); VIEW.visitId = v.id; render(); break; }
+    case "collect": {
+      const v = visit(id);
+      const method = $("#payMethod").value, tendered = parseFloat($("#payTendered").value);
+      const due = v.bill.totals.patient;
+      if (tendered < due - 0.004) { toast(LANG === "ar" ? "المبلغ أقل من المستحق" : "Amount received is less than the patient share", true); break; }
+      collect(v, method, due);
+      const change = E.round2(tendered - due);
+      modal(T("b_receipt"), receipt(v) + (change > 0 ? '<div class="note" style="margin-top:10px">' + esc(T("b_change")) + ": " + esc(qar(change)) + "</div>" : ""),
+        '<button class="btn ghost" data-act="print">' + esc(T("print")) + "</button>" +
+        '<button class="btn primary" data-act="close-modal">' + esc(T("close")) + "</button>");
+      VIEW.visitId = null; renderNav(); break;
+    }
+    case "print": window.print(); break;
+    case "submit-claim": { submitClaim(DB.claims.find(c => c.id === id)); toast(T("cl_submit") + " ✓ " + id); render(); break; }
+    case "settle-claim": settleModal(DB.claims.find(c => c.id === id)); break;
+    case "do-settle": {
+      const c = DB.claims.find(x => x.id === id);
+      settleClaim(c, parseFloat($("#stAmt").value) || 0, $("#stWhy").value);
+      closeModal(); toast(T("cl_settle") + " ✓ " + id); render(); break;
+    }
+  }
+});
+
+document.addEventListener("change", e => {
+  const el = e.target, act = el.dataset.act;
+  if (act === "set-doctor") { VIEW.apptDoctor = el.value; render(); }
+  if (act === "set-date") { VIEW.apptDate = el.value; render(); }
+  if (act === "fin-from") { VIEW.finFrom = el.value; render(); }
+  if (act === "fin-to") { VIEW.finTo = el.value; render(); }
+  if (act === "add-dx" && el.value) { const v = visit(VIEW.visitId) || DB.visits.find(x => x.stage === "in_consult");
+    if (v && v.dx.indexOf(el.value) === -1) v.dx.push(el.value); VIEW.visitId = v.id; captureConsult(v); render(); }
+  if (act === "add-svc" && el.value) { const v = visit(VIEW.visitId) || DB.visits.find(x => x.stage === "in_consult");
+    captureConsult(v); addItem(v, el.value, 1); VIEW.visitId = v.id; render(); }
+});
+
+document.addEventListener("input", e => {
+  if (e.target.dataset.act === "search") { VIEW.search = e.target.value; const pos = e.target.selectionStart;
+    render(); const s = $("#ptSearch"); if (s) { s.focus(); s.setSelectionRange(pos, pos); } }
+  if (e.target.id === "f_qid") {
+    const r = E.validateQID(e.target.value);
+    const h = $("#qidHint"); if (h) { h.textContent = r.ok ? "✓ " + (LANG === "ar" ? "سنة الميلاد" : "birth year") + " " + r.birthYear : r.reason;
+      h.className = r.ok ? "hint" : "err"; }
+  }
+});
+
+function captureConsult(v) {
+  if (!v) return;
+  document.querySelectorAll("[data-vital]").forEach(i => { v.vitals[i.dataset.vital] = i.value; });
+  document.querySelectorAll("[data-fld]").forEach(i => { v[i.dataset.fld] = i.value; });
+}
+
+$("#langBtn").addEventListener("click", () => {
+  LANG = LANG === "en" ? "ar" : "en";
+  document.body.dir = STR[LANG].dir; document.documentElement.lang = LANG; document.documentElement.dir = STR[LANG].dir;
+  render();
+});
+$("#roleSel").addEventListener("change", e => {
+  ROLE = e.target.value;
+  const home = { admin: "dash", reception: "patients", doctor: "consult", cashier: "billing", finance: "finance" }[ROLE];
+  go(home, { visitId: null });
+});
+
+/* ==========================================================================
+   v2 — document scanning, patient messaging, automation, persistence
+   ========================================================================== */
+
+Object.assign(STR.en, {
+  g_auto: "Automation",
+  nav_kiosk: "Self check-in", nav_outbox: "Messages", nav_auto: "Automation rules",
+  scan_doc: "Scan document", scan_t: "Scan passport or Qatar ID",
+  scan_s: "Hold the machine-readable strip under the reader, or take a photo of it. Every check digit is verified before anything is filled in.",
+  scan_wedge: "Reader input", scan_wedge_hint: "Most document readers type the MRZ like a keyboard. Click here and scan.",
+  scan_camera: "Use camera", scan_capture: "Capture", scan_demo: "Demo document",
+  scan_ok: "Document verified", scan_bad: "Could not verify this document",
+  scan_use: "Use these details", scan_known: "This person already has a file",
+  k_t: "Self check-in", k_s: "The patient scans, the system does the rest. No counter, no queue, no form.",
+  k_scan: "Scan your Qatar ID or passport to check in",
+  k_welcome: "Welcome", k_ticket: "Your queue number", k_position: "Ahead of you", k_eta: "Estimated time",
+  k_room: "Room", k_noappt: "No appointment today — choose a department for a walk-in",
+  k_newfile: "New file created", k_mobile: "Mobile number for updates", k_done: "You are checked in",
+  k_again: "Next patient", k_walkin: "Walk in now",
+  o_t: "Patient messages", o_s: "Every message the system sent, why it sent it, and what it cost in SMS parts.",
+  o_channel: "Channel", o_to: "To", o_body: "Message", o_when: "Sent", o_parts: "Parts",
+  o_queued: "Queued", o_sent: "Sent", o_failed: "Failed", o_gateway: "SMS gateway", o_send: "Send queued now",
+  a_t: "Automation rules", a_s: "What the system does without being asked. Turn a rule off and that step goes back to a person.",
+  a_board: "Doctor status board", a_on_time: "On time", a_delayed: "Running late", a_heavily_delayed: "Heavily delayed",
+  a_delay: "behind", a_eta: "Next call", a_waiting: "waiting", a_threshold: "Tell patients when a doctor is this many minutes late",
+  a_noshow: "Mark a booking as no-show this many minutes after the slot",
+  a_gateway_note: "Messages are queued locally in this prototype. Point the gateway at a live provider to send for real.",
+  auto_booking: "Confirm every booking by message",
+  auto_checkin: "Send queue number and estimated time on check-in",
+  auto_delay: "Warn waiting patients when the doctor falls behind",
+  auto_next: "Tell a patient when they are next",
+  auto_bill: "Send the amount due and a payment link after consultation",
+  auto_elig: "Verify the insurance card at check-in",
+  auto_appr: "Request insurer pre-approval automatically",
+  auto_claim: "Submit claims as soon as the visit is billed",
+  auto_resubmit: "Re-submit rejected claims once corrected",
+  auto_noshow: "Close out no-shows and offer a new slot",
+  auto_kiosk: "Allow patients to check themselves in",
+  doc_passport: "Passport", doc_id: "Qatar ID", doc_num: "Document number", doc_exp: "Expiry",
+  reset_demo: "Reset demo data", saved_local: "Saved on this device"
+});
+Object.assign(STR.ar, {
+  g_auto: "الأتمتة",
+  nav_kiosk: "التسجيل الذاتي", nav_outbox: "الرسائل", nav_auto: "قواعد الأتمتة",
+  scan_doc: "مسح المستند", scan_t: "مسح جواز السفر أو البطاقة الشخصية",
+  scan_s: "مرّر الشريط أسفل البطاقة على القارئ أو صوّره. يتم التحقق من كل رقم تدقيق قبل تعبئة أي بيانات.",
+  scan_wedge: "مدخل القارئ", scan_wedge_hint: "معظم القارئات تكتب البيانات كلوحة مفاتيح. انقر هنا ثم امسح.",
+  scan_camera: "استخدام الكاميرا", scan_capture: "التقاط", scan_demo: "مستند تجريبي",
+  scan_ok: "تم التحقق من المستند", scan_bad: "تعذر التحقق من المستند",
+  scan_use: "استخدام هذه البيانات", scan_known: "لهذا الشخص ملف بالفعل",
+  k_t: "التسجيل الذاتي", k_s: "المريض يمسح بطاقته والنظام يتولى الباقي. بلا طابور وبلا استمارات.",
+  k_scan: "امسح بطاقتك الشخصية أو جواز سفرك لتسجيل الحضور",
+  k_welcome: "أهلاً", k_ticket: "رقمك في الانتظار", k_position: "أمامك", k_eta: "الوقت المتوقع",
+  k_room: "غرفة", k_noappt: "لا يوجد موعد اليوم — اختر قسماً للحضور المباشر",
+  k_newfile: "تم إنشاء ملف جديد", k_mobile: "رقم الجوال لاستقبال التحديثات", k_done: "تم تسجيل حضورك",
+  k_again: "المريض التالي", k_walkin: "حضور مباشر",
+  o_t: "رسائل المرضى", o_s: "كل رسالة أرسلها النظام وسببها وعدد أجزائها.",
+  o_channel: "القناة", o_to: "إلى", o_body: "الرسالة", o_when: "الإرسال", o_parts: "الأجزاء",
+  o_queued: "في الانتظار", o_sent: "مرسلة", o_failed: "فشلت", o_gateway: "بوابة الرسائل", o_send: "إرسال المعلّق",
+  a_t: "قواعد الأتمتة", a_s: "ما ينفذه النظام تلقائياً. إيقاف أي قاعدة يعيد تلك الخطوة إلى الموظف.",
+  a_board: "حالة الأطباء", a_on_time: "في الموعد", a_delayed: "متأخر", a_heavily_delayed: "تأخير كبير",
+  a_delay: "تأخير", a_eta: "النداء القادم", a_waiting: "في الانتظار",
+  a_threshold: "إبلاغ المرضى عند تأخر الطبيب بهذا العدد من الدقائق",
+  a_noshow: "اعتبار الحجز عدم حضور بعد هذا العدد من الدقائق",
+  a_gateway_note: "الرسائل محفوظة محلياً في هذا النموذج. اربط البوابة بمزوّد فعلي للإرسال الحقيقي.",
+  auto_booking: "تأكيد كل حجز برسالة",
+  auto_checkin: "إرسال رقم الانتظار والوقت المتوقع عند الحضور",
+  auto_delay: "تنبيه المنتظرين عند تأخر الطبيب",
+  auto_next: "إبلاغ المريض أنه التالي",
+  auto_bill: "إرسال المبلغ المستحق ورابط الدفع بعد الكشف",
+  auto_elig: "التحقق من بطاقة التأمين عند الحضور",
+  auto_appr: "طلب الموافقة المسبقة تلقائياً",
+  auto_claim: "إرسال المطالبات فور الفوترة",
+  auto_resubmit: "إعادة إرسال المطالبات المرفوضة بعد التصحيح",
+  auto_noshow: "إغلاق حالات عدم الحضور وعرض موعد جديد",
+  auto_kiosk: "السماح للمرضى بتسجيل حضورهم ذاتياً",
+  doc_passport: "جواز سفر", doc_id: "بطاقة شخصية", doc_num: "رقم المستند", doc_exp: "الانتهاء",
+  reset_demo: "إعادة ضبط البيانات التجريبية", saved_local: "محفوظ على هذا الجهاز"
+});
+
+/* ------------------------- new state ------------------------- */
+DB.outbox = DB.outbox || [];
+DB.stats = DB.stats || { consult: {} };
+DB.gateway = DB.gateway || {
+  provider: "Ooredoo Qatar — SMS API", sender: "ALNOOR",
+  endpoint: "https://api.provider.qa/v1/messages", connected: false
+};
+DB.automation = DB.automation || {
+  kiosk: true, booking: true, checkin: true, delay: true, next: true, bill: true,
+  elig: true, appr: true, claim: true, resubmit: true, noshow: true,
+  delayThreshold: 15, noShowMinutes: 20
+};
+const AR_NAT = ["Qatari","Egyptian","Sudanese","Syrian","Jordanian","Lebanese","Palestinian","Yemeni",
+                "Moroccan","Tunisian","Algerian","Saudi","Emirati","Kuwaiti","Bahraini","Omani","Iraqi"];
+const patLang = p => p.lang || (AR_NAT.indexOf(p.nationality) !== -1 ? "ar" : "en");
+const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+
+/* ------------------------- messaging ------------------------- */
+function notify(mrn, key, vars, force) {
+  const p = pt(mrn); if (!p || !p.phone) return null;
+  const lang = patLang(p);
+  const body = E.renderTemplate(key, lang, Object.assign({
+    name: (lang === "ar" && p.ar ? p.ar : p.en).split(" ")[0],
+    centre: lang === "ar" ? DB.centre.ar : DB.centre.en
+  }, vars || {}));
+  if (!body) return null;
+  const seg = E.smsParts(body);
+  const m = { id: "MSG-" + (DB.outbox.length + 1001), at: new Date().toTimeString().slice(0, 5),
+              date: TODAY, mrn, to: p.phone, channel: DB.automation.channel || "sms", key, lang,
+              body, parts: seg.parts, encoding: seg.encoding, status: "queued", ref: "" };
+  DB.outbox.push(m);
+  dispatch(m);
+  return m;
+}
+/* The only place a real gateway call would go. Swap the body of this function
+   for a fetch() to the provider and nothing else in the system changes.      */
+function dispatch(m) {
+  if (!DB.gateway.connected) { m.status = "queued"; return; }
+  m.status = "sent"; m.ref = "PRV-" + Math.random().toString(36).slice(2, 9).toUpperCase();
+}
+function sendQueued() {
+  const q = DB.outbox.filter(m => m.status === "queued");
+  q.forEach(m => { m.status = "sent"; m.ref = "PRV-" + Math.random().toString(36).slice(2, 9).toUpperCase(); });
+  return q.length;
+}
+
+/* ------------------------- doctor status ------------------------- */
+function avgConsult(docId) {
+  const a = DB.stats.consult[docId];
+  if (!a || !a.length) return 15;
+  return Math.max(6, Math.round(a.reduce((s, x) => s + x, 0) / a.length));
+}
+function doctorStatus(docId) {
+  const waiting = DB.visits.filter(v => v.doctorId === docId && v.date === TODAY && v.stage === "checked_in")
+    .sort((a, b) => (a.checkedInAt || a.time).localeCompare(b.checkedInAt || b.time));
+  const cur = DB.visits.find(v => v.doctorId === docId && v.date === TODAY && v.stage === "in_consult");
+  const r = E.predictQueue({
+    nowMinutes: nowMin(), avgConsultMinutes: avgConsult(docId),
+    current: cur ? { startedAt: cur.calledAt } : null,
+    waiting: waiting.map(v => ({ id: v.id, scheduled: v.time, arrived: v.checkedInAt }))
+  });
+  r.waitingVisits = waiting; r.current = cur; r.doctorId = docId;
+  return r;
+}
+
+/* ------------------------- automation ------------------------- */
+function runAutomations() {
+  const A = DB.automation;
+
+  DB.doctors.forEach(d => {
+    const st = doctorStatus(d.id);
+    st.queue.forEach((q, i) => {
+      const v = visit(q.id); if (!v) return;
+      v.notified = v.notified || {};
+      if (A.delay && q.delayMinutes >= A.delayThreshold) {
+        const bucket = Math.floor(q.delayMinutes / A.delayThreshold);
+        if (v.notified.delayBucket !== bucket) {
+          v.notified.delayBucket = bucket;
+          notify(v.mrn, "doctor_delay", { doctor: L(d), delay: q.delayMinutes, eta: q.eta });
+        }
+      }
+      if (A.next && i === 0 && !v.notified.next) {
+        v.notified.next = true;
+        notify(v.mrn, "you_are_next", { room: d.room, doctor: L(d) });
+      }
+    });
+  });
+
+  if (A.noshow) {
+    DB.visits.filter(v => v.stage === "booked" && v.date === TODAY).forEach(v => {
+      const sched = E.minutesOf(v.time);
+      if (sched != null && nowMin() > sched + A.noShowMinutes) {
+        v.stage = "no_show";
+        const a = DB.appointments.find(x => x.id === v.apptId); if (a) a.status = "no_show";
+        notify(v.mrn, "no_show", { time: v.time, doctor: L(doc(v.doctorId)) });
+      }
+    });
+  }
+
+  if (A.claim) DB.claims.filter(c => c.status === "draft").forEach(submitClaim);
+
+  if (A.appr) {
+    DB.visits.filter(v => v.stage === "ready_to_bill" && v.bill).forEach(v => {
+      v.notified = v.notified || {};
+      v.bill.pendingApprovals.forEach(pa => {
+        const k = "appr_" + pa.code;
+        if (!v.notified[k]) {
+          v.notified[k] = true;
+          v.approvals = v.approvals || [];
+          v.approvals.push({ code: pa.code, amount: pa.amount, status: "requested", at: TODAY });
+          notify(v.mrn, "approval_pending", { service: L(svc(pa.code)) });
+        }
+      });
+    });
+  }
+}
+
+/* ------------------------- wrap the flow with messaging ------------------------- */
+const _book = bookAppointment;
+bookAppointment = function (mrn, docId, date, time) {
+  const v = _book(mrn, docId, date, time);
+  if (DB.automation.booking) notify(mrn, "booked", {
+    doctor: L(doc(docId)), dept: L(dept(doc(docId).dept)), date, time });
+  return v;
+};
+const _checkIn = checkIn;
+checkIn = function (v) {
+  _checkIn(v);
+  const st = doctorStatus(v.doctorId);
+  const q = st.queue.find(x => x.id === v.id) || { position: st.queue.length, eta: "—" };
+  v.ticket = "Q" + String(DB.visits.filter(x => x.date === TODAY && x.checkedInAt).length).padStart(3, "0");
+  if (DB.automation.checkin) notify(v.mrn, "checked_in", { position: q.position, eta: q.eta });
+  if (DB.automation.elig && v.eligibility && !v.eligibility.eligible)
+    notify(v.mrn, "eligibility_failed", { reason: v.eligibility.reasons.map(reasonText).join(", ") });
+  runAutomations();
+  return v;
+};
+const _call = callPatient;
+callPatient = function (v) {
+  _call(v);
+  notify(v.mrn, "called", { room: doc(v.doctorId).room, doctor: L(doc(v.doctorId)) });
+  runAutomations();
+  return v;
+};
+const _toCashier = sendToCashier;
+sendToCashier = function (v) {
+  _toCashier(v);
+  if (v.calledAt) {
+    const mins = Math.max(3, nowMin() - E.minutesOf(v.calledAt));
+    (DB.stats.consult[v.doctorId] = DB.stats.consult[v.doctorId] || []).push(mins);
+  }
+  if (DB.automation.bill) notify(v.mrn, "bill_ready", {
+    amount: qar(v.bill.totals.patient), link: "pay.alnoor.qa/" + v.id.toLowerCase() });
+  runAutomations();
+  return v;
+};
+const _collect = collect;
+collect = function (v, method, tendered) {
+  _collect(v, method, tendered);
+  const last = v.payments[v.payments.length - 1];
+  notify(v.mrn, "paid", { amount: qar(last.amount), ref: last.ref });
+  runAutomations();
+  return v;
+};
+const _settle = settleClaim;
+settleClaim = function (c, amt, reason) {
+  _settle(c, amt, reason);
+  if (c.status === "rejected" && DB.automation.resubmit) c.resubmit = "queued";
+  return c;
+};
+
+/* ------------------------- document scanning ------------------------- */
+let SCAN = { parsed: null, onDone: null, mode: "reader", stream: null };
+
+const DEMO_DOCS = [
+  { label: "Qatar ID — Mariam Al-Sulaiti", build: () => E.buildTD1({ documentType: "ID", issuer: "QAT",
+      documentNumber: "QA7741203", dob: "860314", sex: "F", expiry: "280731", nationality: "QAT",
+      optional1: "28634500912", surname: "AL SULAITI", givenNames: "MARIAM AHMED" }) },
+  { label: "Qatar ID — new patient", build: () => E.buildTD1({ documentType: "ID", issuer: "QAT",
+      documentNumber: "QA9930561", dob: "940722", sex: "M", expiry: "290430", nationality: "IND",
+      optional1: "29414700233", surname: "PILLAI", givenNames: "SANJAY RAVI" }) },
+  { label: "Passport — new patient", build: () => E.buildTD3({ issuer: "PHL", documentNumber: "P4471902",
+      dob: "910205", sex: "F", expiry: "300118", nationality: "PHL", optionalData: "",
+      surname: "SANTOS", givenNames: "MARICEL CRUZ" }) }
+];
+
+function scanModal(onDone) {
+  SCAN = { parsed: null, onDone: onDone, mode: "reader", stream: null };
+  modal(T("scan_t"),
+    '<p class="mini" style="margin-top:0">' + esc(T("scan_s")) + "</p>" +
+    '<div style="display:flex;gap:8px;margin-bottom:14px">' +
+      '<button class="chip on" data-act="scan-mode" data-m="reader">' + esc(T("scan_wedge")) + "</button>" +
+      '<button class="chip" data-act="scan-mode" data-m="camera">' + esc(T("scan_camera")) + "</button>" +
+      '<button class="chip" data-act="scan-mode" data-m="demo">' + esc(T("scan_demo")) + "</button>" +
+    "</div><div id=\"scanPane\"></div><div id=\"scanOut\"></div>",
+    '<button class="btn ghost" data-act="close-modal">' + esc(T("cancel")) + "</button>" +
+    '<button class="btn primary" data-act="scan-use" disabled id="scanUse">' + esc(T("scan_use")) + "</button>");
+  scanPane("reader");
+}
+
+function scanPane(mode) {
+  SCAN.mode = mode;
+  document.querySelectorAll("[data-act='scan-mode']").forEach(b => b.classList.toggle("on", b.dataset.m === mode));
+  const pane = $("#scanPane");
+  if (mode === "reader") {
+    pane.innerHTML = '<label>' + esc(T("scan_wedge")) + '</label><textarea id="mrzIn" rows="3" spellcheck="false" ' +
+      'style="font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-size:13px" ' +
+      'placeholder="IDQAT..."></textarea><div class="hint">' + esc(T("scan_wedge_hint")) + "</div>";
+    const ta = $("#mrzIn"); ta.focus();
+    ta.addEventListener("input", () => { if (ta.value.replace(/\s/g, "").length >= 56) scanResult(E.parseMRZ(ta.value)); });
+  } else if (mode === "camera") {
+    pane.innerHTML = '<video id="camV" autoplay playsinline style="width:100%;border-radius:6px;background:#000;max-height:240px"></video>' +
+      '<div style="display:flex;gap:8px;margin-top:10px"><button class="btn" data-act="scan-capture">' + esc(T("scan_capture")) +
+      '</button></div><canvas id="camC" style="display:none"></canvas>' +
+      '<div class="hint">Reads the strip with on-device OCR. A dedicated document reader is faster and does not need light.</div>';
+    navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(st => { SCAN.stream = st; $("#camV").srcObject = st; })
+      .catch(() => { pane.innerHTML = '<div class="note warn">No camera available on this device. Use the reader input or a demo document.</div>'; });
+  } else {
+    pane.innerHTML = DEMO_DOCS.map((d, i) => '<button class="btn ghost" style="width:100%;margin-bottom:8px;text-align:start" ' +
+      'data-act="scan-demo" data-i="' + i + '">' + esc(d.label) + "</button>").join("");
+  }
+}
+
+function scanResult(parsed) {
+  SCAN.parsed = parsed;
+  const out = $("#scanOut"); if (!out) return;
+  const use = $("#scanUse");
+  if (!parsed || !parsed.valid) {
+    const failed = parsed && parsed.checks ? Object.keys(parsed.checks).filter(k => !parsed.checks[k]) : [];
+    out.innerHTML = '<div class="note stop" style="margin-top:14px"><b>' + esc(T("scan_bad")) + "</b>" +
+      (failed.length ? "<br>Check digit failed on: " + esc(failed.join(", ")) : "") + "</div>";
+    if (use) use.disabled = true;
+    return;
+  }
+  const existing = findByDocument(parsed);
+  out.innerHTML = '<div class="note" style="margin-top:14px"><b>' + esc(T("scan_ok")) + "</b> — " +
+      esc(parsed.format) + " · " + Object.keys(parsed.checks).length + " check digits verified</div>" +
+    '<div class="grid g2" style="margin-top:12px">' +
+      minirow(T("pt_name"), parsed.fullName) +
+      minirow(T("doc_num"), parsed.documentNumber) +
+      minirow(T("pt_dob"), parsed.dateOfBirth) +
+      minirow(T("pt_sex"), parsed.sex === "F" ? T("pt_female") : T("pt_male")) +
+      minirow(T("pt_nat"), E.nationalityName(parsed.nationality)) +
+      minirow(T("doc_exp"), parsed.expiry) +
+      (parsed.qid ? minirow(T("pt_qid"), parsed.qid) : "") +
+    "</div>" +
+    (existing ? '<div class="note warn" style="margin-top:12px">' + esc(T("scan_known")) + ": " +
+      esc(L(existing)) + " · " + esc(existing.mrn) + "</div>" : "");
+  if (use) use.disabled = false;
+}
+
+function findByDocument(parsed) {
+  return DB.patients.find(p =>
+    (parsed.qid && p.qid === parsed.qid) ||
+    (p.documents || []).some(d => d.number === parsed.documentNumber && d.issuer === parsed.issuer));
+}
+
+function stopCam() { if (SCAN.stream) { SCAN.stream.getTracks().forEach(t => t.stop()); SCAN.stream = null; } }
+
+function patientFromMRZ(m, phone) {
+  const p = registerPatient({
+    en: m.fullName, ar: "", qid: m.qid || "", healthCard: "", dob: m.dateOfBirth,
+    sex: m.sex || "M", nationality: E.nationalityName(m.nationality),
+    phone: phone || "", email: "", address: "", insurance: null,
+    documents: [{ type: m.format === "TD3" ? "passport" : "id_card", number: m.documentNumber,
+                  issuer: m.issuer, expiry: m.expiry, scannedAt: TODAY }],
+    source: "scan"
+  });
+  return p;
+}
+
+/* ------------------------- kiosk ------------------------- */
+VIEW.kiosk = { stage: "idle", mrz: null, mrn: null, visitId: null };
+
+function nextFreeSlot(docId, date) {
+  const taken = DB.visits.filter(v => v.doctorId === docId && v.date === date).map(v => v.time);
+  const now = nowMin();
+  return SLOT_TIMES.find(t => taken.indexOf(t) === -1 && E.minutesOf(t) >= now - 10) || SLOT_TIMES[0];
+}
+function leastBusyDoctor(deptId) {
+  return DB.doctors.filter(d => d.dept === deptId)
+    .map(d => ({ d, n: DB.visits.filter(v => v.doctorId === d.id && v.date === TODAY &&
+        ["booked", "checked_in", "in_consult"].indexOf(v.stage) !== -1).length }))
+    .sort((a, b) => a.n - b.n)[0].d;
+}
+
+function kioskScan(parsed) {
+  const K = VIEW.kiosk; K.mrz = parsed;
+  const existing = findByDocument(parsed);
+  if (!existing) { K.stage = "mobile"; K.mrn = null; render(); return; }
+  K.mrn = existing.mrn;
+  const booked = DB.visits.find(v => v.mrn === existing.mrn && v.date === TODAY && v.stage === "booked");
+  if (booked) { checkIn(booked); K.visitId = booked.id; K.stage = "done"; }
+  else K.stage = "walkin";
+  render();
+}
+function kioskWalkIn(deptId) {
+  const K = VIEW.kiosk;
+  const d = leastBusyDoctor(deptId);
+  const v = bookAppointment(K.mrn, d.id, TODAY, nextFreeSlot(d.id, TODAY));
+  checkIn(v); K.visitId = v.id; K.stage = "done"; render();
+}
+
+function viewKiosk() {
+  const K = VIEW.kiosk;
+  const wrap = inner => '<div class="card" style="max-width:620px;margin:0 auto"><div class="body" style="padding:32px;text-align:center">' + inner + "</div></div>";
+
+  if (K.stage === "idle") return head("k_t", "k_s") + wrap(
+    '<div style="font-size:56px;line-height:1;margin-bottom:14px">⌗</div>' +
+    "<h2 style=\"margin-bottom:8px\">" + esc(T("k_scan")) + "</h2>" +
+    '<p class="mini" style="max-width:38ch;margin:0 auto 20px">' +
+    esc(LANG === "ar" ? "لا حاجة لاستمارة. تُقرأ البيانات من الشريط ويُتحقق منها آلياً."
+                      : "No form to fill. Details are read from the strip and verified before your file is touched.") + "</p>" +
+    '<button class="btn primary" data-act="kiosk-scan" style="padding:14px 28px;font-size:16px">' + esc(T("scan_doc")) + "</button>");
+
+  if (K.stage === "mobile") return head("k_t", "k_s") + wrap(
+    "<h2>" + esc(T("k_newfile")) + "</h2>" +
+    '<p class="mini">' + esc(K.mrz.fullName) + " · " + esc(E.nationalityName(K.mrz.nationality)) + " · " + esc(K.mrz.dateOfBirth) + "</p>" +
+    '<div style="max-width:280px;margin:18px auto 0;text-align:start">' +
+      fld(T("k_mobile"), '<input id="kioskPhone" inputmode="numeric" placeholder="33xxxxxx">') +
+      '<div id="kioskErr"></div>' +
+    "</div>" +
+    '<button class="btn primary" data-act="kiosk-newfile">' + esc(T("confirm")) + "</button>");
+
+  if (K.stage === "walkin") {
+    const p = pt(K.mrn);
+    return head("k_t", "k_s") + wrap(
+      "<h2>" + esc(T("k_welcome")) + ", " + esc(L(p).split(" ")[0]) + "</h2>" +
+      '<p class="mini">' + esc(T("k_noappt")) + "</p>" +
+      '<div class="grid g2" style="margin-top:18px;text-align:start">' +
+        DB.departments.filter(d => DB.doctors.some(x => x.dept === d.id)).map(d => {
+          const dr = leastBusyDoctor(d.id), st = doctorStatus(dr.id);
+          return '<button class="btn ghost" data-act="kiosk-walkin" data-id="' + d.id + '" style="text-align:start">' +
+            esc(L(d)) + '<div class="mini">' + esc(L(dr)) + " · " + st.queue.length + " " + esc(T("a_waiting")) + "</div></button>";
+        }).join("") +
+      "</div>");
+  }
+
+  const v = visit(K.visitId), p = pt(K.mrn), d = doc(v.doctorId), st = doctorStatus(v.doctorId);
+  const q = st.queue.find(x => x.id === v.id) || { position: 1, eta: "—", delayMinutes: 0 };
+  const stCls = { on_time: "teal", delayed: "amber", heavily_delayed: "bad" }[st.status];
+  return head("k_t", "k_s") + wrap(
+    '<div style="font-size:40px;line-height:1">✓</div><h2 style="margin:10px 0 4px">' + esc(T("k_done")) + "</h2>" +
+    '<p class="mini">' + esc(L(p)) + " · " + esc(v.mrn) + "</p>" +
+    '<div class="grid g3" style="margin:22px 0">' +
+      '<div><div class="mini">' + esc(T("k_ticket")) + '</div><div class="val num" style="font-size:30px;font-weight:650">' + esc(v.ticket || "—") + "</div></div>" +
+      '<div><div class="mini">' + esc(T("k_position")) + '</div><div class="val num" style="font-size:30px;font-weight:650">' + (q.position - 1) + "</div></div>" +
+      '<div><div class="mini">' + esc(T("k_eta")) + '</div><div class="val num" style="font-size:30px;font-weight:650">' + esc(q.eta) + "</div></div>" +
+    "</div>" +
+    '<div class="rowline"><span>' + esc(T("dr_of")) + "</span><b>" + esc(L(d)) + "</b></div>" +
+    '<div class="rowline"><span>' + esc(T("k_room")) + "</span><b>" + esc(d.room) + "</b></div>" +
+    '<div class="rowline"><span>' + esc(T("status")) + '</span><span class="pill ' + stCls + '">' + esc(T("a_" + st.status)) +
+      (st.doctorDelayMinutes ? " · " + st.doctorDelayMinutes + "m" : "") + "</span></div>" +
+    (v.eligibility && !v.eligibility.eligible ? '<div class="note warn" style="margin-top:14px;text-align:start">' +
+      esc(T("ins_not")) + " — " + esc(v.eligibility.reasons.map(reasonText).join(", ")) + "</div>" : "") +
+    '<div class="mini" style="margin-top:16px">' + esc(LANG === "ar" ? "أُرسلت رسالة بالتفاصيل إلى " : "Details sent by message to ") + esc(p.phone) + "</div>" +
+    '<button class="btn ghost" style="margin-top:18px" data-act="kiosk-reset">' + esc(T("k_again")) + "</button>");
+}
+
+/* ------------------------- outbox ------------------------- */
+function viewOutbox() {
+  const today = DB.outbox.filter(m => m.date === TODAY);
+  const parts = sum(DB.outbox, m => m.parts);
+  const g = DB.gateway;
+  const rows = DB.outbox.slice().reverse().slice(0, 80).map(m => {
+    const p = pt(m.mrn);
+    return "<tr><td class=\"num\">" + esc(m.at) + '<div class="mini">' + esc(m.date) + "</div></td><td>" +
+      esc(p ? L(p) : m.mrn) + '<div class="mini num">' + esc(m.to) + "</div></td><td>" +
+      '<span class="pill grey">' + esc(m.key) + '</span></td><td style="max-width:380px">' + esc(m.body) +
+      '</td><td class="r num mini">' + m.parts + " × " + esc(m.encoding) + '</td><td><span class="pill ' +
+      (m.status === "sent" ? "ok" : m.status === "failed" ? "bad" : "amber") + '">' + esc(T("o_" + m.status)) + "</span>" +
+      (m.ref ? '<div class="mini num">' + esc(m.ref) + "</div>" : "") + "</td></tr>";
+  }).join("");
+
+  return head("o_t", "o_s", '<button class="btn" data-act="send-queued">' + esc(T("o_send")) + "</button>") +
+    '<div class="grid g4" style="margin-bottom:16px">' +
+      '<div class="kpi"><div class="lab">' + esc(LANG === "ar" ? "رسائل اليوم" : "Messages today") + '</div><div class="val num">' + today.length + "</div></div>" +
+      '<div class="kpi amber"><div class="lab">' + esc(T("o_queued")) + '</div><div class="val num">' + DB.outbox.filter(m => m.status === "queued").length + "</div></div>" +
+      '<div class="kpi teal"><div class="lab">' + esc(T("o_sent")) + '</div><div class="val num">' + DB.outbox.filter(m => m.status === "sent").length + "</div></div>" +
+      '<div class="kpi"><div class="lab">' + esc(LANG === "ar" ? "أجزاء SMS" : "SMS parts billed") + '</div><div class="val num">' + parts +
+        '</div><div class="foot">' + esc(LANG === "ar" ? "العربية ٧٠ حرفاً للجزء" : "Arabic bills at 70 chars a part") + "</div></div>" +
+    "</div>" +
+    '<div class="card" style="margin-bottom:16px"><header><h3>' + esc(T("o_gateway")) + '</h3><span class="pill ' +
+      (g.connected ? "ok" : "grey") + '">' + esc(g.connected ? "connected" : "not connected") + "</span></header><div class=\"body\">" +
+      '<div class="inline">' + fld(LANG === "ar" ? "المزوّد" : "Provider", '<input data-gw="provider" value="' + esc(g.provider) + '">') +
+        fld(LANG === "ar" ? "اسم المرسل" : "Sender ID", '<input data-gw="sender" value="' + esc(g.sender) + '">') +
+        fld("Endpoint", '<input data-gw="endpoint" value="' + esc(g.endpoint) + '">') + "</div>" +
+      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto" data-gw="connected"' +
+        (g.connected ? " checked" : "") + "> " + esc(LANG === "ar" ? "إرسال فوري عند التوصيل" : "Send immediately when connected") + "</label>" +
+      '<div class="note" style="margin-top:12px">' + esc(T("a_gateway_note")) + "</div>" +
+    "</div></div>" +
+    '<div class="card">' + (rows ? "<table><thead><tr><th>" + esc(T("o_when")) + "</th><th>" + esc(T("o_to")) +
+      "</th><th>" + esc(LANG === "ar" ? "السبب" : "Trigger") + "</th><th>" + esc(T("o_body")) + '</th><th class="r">' +
+      esc(T("o_parts")) + "</th><th>" + esc(T("status")) + "</th></tr></thead><tbody>" + rows + "</tbody></table>"
+      : '<div class="empty">' + esc(T("none")) + "</div>") + "</div>";
+}
+
+/* ------------------------- automation rules ------------------------- */
+function boardCard() {
+  const rows = DB.doctors.map(d => {
+    const st = doctorStatus(d.id);
+    const cls = { on_time: "teal", delayed: "amber", heavily_delayed: "bad" }[st.status];
+    return "<tr><td>" + esc(L(d)) + '<div class="mini">' + esc(L(dept(d.dept))) + " · " + esc(T("k_room")) + " " + esc(d.room) +
+      '</div></td><td><span class="pill ' + cls + '">' + esc(T("a_" + st.status)) + "</span></td>" +
+      '<td class="r num">' + st.queue.length + " " + esc(T("a_waiting")) + '</td><td class="r num">' +
+      (st.doctorDelayMinutes ? st.doctorDelayMinutes + "m " + esc(T("a_delay")) : "—") + '</td><td class="r num">' +
+      (st.queue.length ? esc(st.queue[0].eta) : "—") + "</td><td class=\"r num mini\">" + avgConsult(d.id) + "m avg</td></tr>";
+  }).join("");
+  return '<div class="card"><header><h3>' + esc(T("a_board")) + '</h3><span class="mini">' +
+    esc(LANG === "ar" ? "يُحدَّث تلقائياً" : "recalculated every 20 seconds") + "</span></header><table><tbody>" + rows + "</tbody></table></div>";
+}
+
+function viewAuto() {
+  const A = DB.automation;
+  const row = (k, lab) => '<label style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line-2)">' +
+    '<input type="checkbox" style="width:auto;margin-top:3px" data-auto="' + k + '"' + (A[k] ? " checked" : "") + ">" +
+    "<span>" + esc(T(lab)) + "</span></label>";
+  return head("a_t", "a_s") +
+    '<div class="grid g2" style="margin-bottom:16px">' +
+      '<div class="card"><header><h3>' + esc(LANG === "ar" ? "رسائل المرضى" : "Patient messaging") + '</h3></header><div class="body" style="padding-top:0">' +
+        row("booking", "auto_booking") + row("checkin", "auto_checkin") + row("delay", "auto_delay") +
+        row("next", "auto_next") + row("bill", "auto_bill") + row("noshow", "auto_noshow") +
+        '<div class="inline" style="margin-top:14px">' +
+          fld(T("a_threshold"), '<input type="number" min="5" max="60" data-auto-n="delayThreshold" value="' + A.delayThreshold + '">') +
+          fld(T("a_noshow"), '<input type="number" min="5" max="90" data-auto-n="noShowMinutes" value="' + A.noShowMinutes + '">') +
+        "</div></div></div>" +
+      '<div class="card"><header><h3>' + esc(LANG === "ar" ? "التأمين والتشغيل" : "Insurance and floor") + '</h3></header><div class="body" style="padding-top:0">' +
+        row("kiosk", "auto_kiosk") + row("elig", "auto_elig") + row("appr", "auto_appr") +
+        row("claim", "auto_claim") + row("resubmit", "auto_resubmit") +
+        '<div class="note" style="margin-top:14px">' + esc(LANG === "ar"
+          ? "كل قاعدة موقوفة تعني خطوة يدوية إضافية على الموظف."
+          : "Every rule you switch off becomes a step someone has to remember to do.") + "</div>" +
+      "</div></div>" +
+    "</div>" + boardCard();
+}
+
+/* ------------------------- persistence ------------------------- */
+const SAVE_KEY = "nabd.state.v2";
+let STORE_OK = true;
+function save() {
+  if (!STORE_OK) return;
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({
+    patients: DB.patients, appointments: DB.appointments, visits: DB.visits, claims: DB.claims,
+    payments: DB.payments, journal: DB.journal, outbox: DB.outbox, seq: DB.seq, stats: DB.stats,
+    automation: DB.automation, gateway: DB.gateway, savedOn: TODAY })); }
+  catch (e) { STORE_OK = false; }        /* sandboxed preview — stay in memory */
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY); if (!raw) return false;
+    const d = JSON.parse(raw); if (!d || !d.patients) return false;
+    Object.assign(DB, d); return true;
+  } catch (e) { STORE_OK = false; return false; }
+}
+function resetDemo() {
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  location.reload();
+}
+
+/* ------------------------- wiring ------------------------- */
+NAV[0].items.push(["kiosk", "nav_kiosk"]);
+NAV.splice(3, 0, { grp: "g_auto", items: [["outbox", "nav_outbox"], ["auto", "nav_auto"]] });
+
+const EXTRA = { kiosk: viewKiosk, outbox: viewOutbox, auto: viewAuto };
+const _viewDash = viewDash;
+viewDash = function () { return _viewDash() + '<div style="margin-top:16px"></div>' + boardCard(); };
+const _render = render;
+render = function () {
+  if (EXTRA[VIEW.name]) { renderNav(); $("#view").innerHTML = EXTRA[VIEW.name](); }
+  else _render();
+  save();
+};
+
+/* scan straight into the registration form */
+const _newPt = newPatientModal;
+newPatientModal = function () {
+  _newPt();
+  const b = document.createElement("div");
+  b.innerHTML = '<button class="btn" data-act="scan-open" style="width:100%;margin-bottom:16px">' +
+    esc(T("scan_doc")) + '</button><div class="hint" style="margin:-12px 0 16px">' +
+    esc(LANG === "ar" ? "يملأ الاسم والجنسية وتاريخ الميلاد والرقم الشخصي تلقائياً."
+                      : "Fills name, nationality, date of birth and QID for you.") + "</div>";
+  const body = document.querySelector(".modal .body");
+  body.insertBefore(b, body.firstChild);
+};
+function fillRegFromMRZ(m) {
+  const set = (id, v) => { const e = $("#" + id); if (e && v) e.value = v; };
+  set("f_en", m.fullName); set("f_qid", m.qid); set("f_dob", m.dateOfBirth);
+  set("f_nat", E.nationalityName(m.nationality));
+  const sx = $("#f_sex"); if (sx && m.sex) sx.value = m.sex;
+  const h = $("#qidHint"); if (h && m.qid) { const r = E.validateQID(m.qid);
+    h.textContent = r.ok ? "✓ scanned" : r.reason; h.className = r.ok ? "hint" : "err"; }
+}
+
+async function captureAndRead() {
+  const v = $("#camV"), c = $("#camC"); if (!v || !c) return;
+  c.width = v.videoWidth || 1280; c.height = v.videoHeight || 720;
+  const ctx = c.getContext("2d"); ctx.drawImage(v, 0, 0, c.width, c.height);
+  /* crop the bottom third — the MRZ always sits there */
+  const crop = document.createElement("canvas");
+  crop.width = c.width; crop.height = Math.round(c.height * 0.34);
+  crop.getContext("2d").drawImage(c, 0, c.height - crop.height, c.width, crop.height, 0, 0, crop.width, crop.height);
+  $("#scanOut").innerHTML = '<div class="note" style="margin-top:14px">Reading the strip…</div>';
+  try {
+    if (!window.Tesseract) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js");
+    const r = await window.Tesseract.recognize(crop.toDataURL("image/png"), "eng", {
+      tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<" });
+    scanResult(E.parseMRZ(r.data.text));
+  } catch (e) {
+    $("#scanOut").innerHTML = '<div class="note warn" style="margin-top:14px">On-device OCR is unavailable here. ' +
+      'Use the reader input — a document reader types the strip straight into it — or a demo document.</div>';
+  }
+}
+function loadScript(src) {
+  return new Promise((res, rej) => { const s = document.createElement("script");
+    s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+}
+
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]"); if (!el) return;
+  switch (el.dataset.act) {
+    case "scan-open": scanModal(m => { fillRegFromMRZ(m); closeModal(); stopCam(); newPatientModal(); fillRegFromMRZ(m); }); break;
+    case "scan-mode": stopCam(); scanPane(el.dataset.m); $("#scanOut").innerHTML = ""; $("#scanUse").disabled = true; break;
+    case "scan-demo": scanResult(E.parseMRZ(DEMO_DOCS[Number(el.dataset.i)].build().join("\n"))); break;
+    case "scan-capture": captureAndRead(); break;
+    case "scan-use": { const m = SCAN.parsed, cb = SCAN.onDone; stopCam();
+      if (m && cb) { closeModal(); cb(m); } break; }
+    case "close-modal": stopCam(); break;
+    case "kiosk-scan": scanModal(m => { closeModal(); kioskScan(m); }); break;
+    case "kiosk-newfile": {
+      const ph = E.validateQatarPhone($("#kioskPhone").value);
+      if (!ph.ok) { $("#kioskErr").innerHTML = '<div class="err">' + esc(ph.reason) + "</div>"; break; }
+      const p = patientFromMRZ(VIEW.kiosk.mrz, ph.normalised);
+      VIEW.kiosk.mrn = p.mrn; VIEW.kiosk.stage = "walkin"; render(); break;
+    }
+    case "kiosk-walkin": kioskWalkIn(el.dataset.id); break;
+    case "kiosk-reset": VIEW.kiosk = { stage: "idle", mrz: null, mrn: null, visitId: null }; render(); break;
+    case "send-queued": toast(sendQueued() + (LANG === "ar" ? " رسالة أُرسلت" : " messages sent")); render(); break;
+    case "reset-demo": if (confirm(T("reset_demo") + "?")) resetDemo(); break;
+  }
+});
+
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.dataset.auto) { DB.automation[el.dataset.auto] = el.checked; runAutomations(); render(); }
+  if (el.dataset.autoN) { DB.automation[el.dataset.autoN] = Number(el.value); runAutomations(); render(); }
+  if (el.dataset.gw) {
+    DB.gateway[el.dataset.gw] = el.type === "checkbox" ? el.checked : el.value;
+    if (el.dataset.gw === "connected" && el.checked) sendQueued();
+    render();
+  }
+});
+
+/* reset control in the top bar */
+(function () {
+  const b = document.createElement("button");
+  b.className = "chip"; b.dataset.act = "reset-demo"; b.textContent = "⟲";
+  b.title = "Reset demo data";
+  $("#langBtn").parentNode.insertBefore(b, $("#langBtn"));
+})();
+
+/* ------------------------- boot ------------------------- */
+load();
+runAutomations();
+setInterval(function () {
+  runAutomations();
+  if (["dash", "queue", "kiosk", "outbox", "auto", "appts"].indexOf(VIEW.name) !== -1) render();
+}, 20000);
+
+render();
+</script>
+</body>
+</html>
